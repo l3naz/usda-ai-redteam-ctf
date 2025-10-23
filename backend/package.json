@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend-for-ai",
+  "keywords": [
+    "backend",
+    "usda"
+  ],
+  "license": "ISC",
+  "author": "hacker-district",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@google/genai": "^1.22.0",
+    "@prisma/client": "^6.16.3",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.3"
+  }
+}
