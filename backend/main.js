@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const challenges = require('./challenges.json');
+const {error} = require('./Middlewares/errormiddleware')
 
 const app = express();
 app.use(express.json());
@@ -25,7 +26,7 @@ function systemFor(levelKey) {
 }
 
 // Single endpoint: start or continue chat
-app.post('/api', async (req, res) => {
+app.post('/api', async (req, res, next) => {
   try {
     const { sessionId, level, message } = req.body || {};
 
@@ -69,12 +70,16 @@ app.post('/api', async (req, res) => {
     s.history.push({ role: 'model', parts: [{ text }] });
 
     res.json({ sessionId: sid, level: s.level, reply: text });
-  } catch (e) {
-    console.error('Chat error:', e);
-    res.status(500).json({ error: 'LLM call failed' });
+  } catch (err) {
+    console.error('Chat error:', err);
+    //res.status(500).json({ error: 'LLM call failed' });
+    return  next(err)
   }
 });
 
 app.get('/', (_req, res) => res.send('API OK'));
+
+app.use(error)
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`API listening on :${PORT}`));
