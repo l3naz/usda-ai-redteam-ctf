@@ -1,3 +1,7 @@
+// 🔐 ENV PLACEHOLDER — Authentication Configuration
+// Firebase OAuth is configured via environment variables (see README.md)
+// Secrets must be stored in .env file, NEVER in this code
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Button } from "../ui/button";

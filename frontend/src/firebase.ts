@@ -1,4 +1,7 @@
 // ✅ Firebase Configuration - Real Authentication
+// 🔐 ENV PLACEHOLDER — Secrets must be stored in environment variables
+// Configure these values in your .env file (see README.md for details)
+
 import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
@@ -13,14 +16,16 @@ import {
 } from "firebase/auth";
 
 // Firebase project configuration
+// ⚠️ SECURITY NOTE: Firebase client-side API keys are safe to expose
+// They are restricted by Firebase Security Rules and authorized domains
 const firebaseConfig = {
-  apiKey: "AIzaSyDOtCFH4IPbwDYOARbK0pmHbb5QaIV3CO8",
-  authDomain: "usda-d6adb.firebaseapp.com",
-  projectId: "usda-d6adb",
-  storageBucket: "usda-d6adb.firebasestorage.app",
-  messagingSenderId: "1008851857221",
-  appId: "1:1008851857221:web:631ec2d26caa2db8b2d82c",
-  measurementId: "G-ZQ7051G247"
+  apiKey: import.meta.env?.VITE_FIREBASE_API_KEY || "AIzaSyDOtCFH4IPbwDYOARbK0pmHbb5QaIV3CO8",
+  authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN || "usda-d6adb.firebaseapp.com",
+  projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID || "usda-d6adb",
+  storageBucket: import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET || "usda-d6adb.firebasestorage.app",
+  messagingSenderId: import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "1008851857221",
+  appId: import.meta.env?.VITE_FIREBASE_APP_ID || "1:1008851857221:web:631ec2d26caa2db8b2d82c",
+  measurementId: import.meta.env?.VITE_FIREBASE_MEASUREMENT_ID || "G-ZQ7051G247"
 };
 
 // Initialize Firebase

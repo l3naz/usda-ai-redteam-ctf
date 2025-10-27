@@ -1,339 +1,199 @@
-# 🛡️ USDA AI Red Team Training Game
+# README - Integration Guide
 
-> Professional federal training platform teaching cybersecurity concepts through interactive learning modules
+## USDA AI Red Team Training Game
 
-## 🚀 Quick Start
+### Project Overview
+**Name:** USDA AI Red Team Training Game  
+**Purpose:** Professional federal training platform teaching cybersecurity concepts through interactive learning modules  
+**Features:** Learn, Play, Dashboard, Profile, and Leaderboard pages with real-time progress tracking
 
-```bash
-# That's it - just run the app!
-npm run dev
-```
-
-**No configuration needed. No external dependencies. No Firebase setup.**
-
----
-
-## ✅ Current Status
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Authentication | ✅ Working | Mock auth - no Firebase needed |
-| All Pages | ✅ Working | Dashboard, Learn, Play, Profile, Leaderboard |
-| Routing | ✅ Working | All routes properly connected |
-| Dark Mode | ✅ Working | Professional theme toggle |
-| Protected Routes | ✅ Working | Requires authentication |
-| Console Errors | ✅ Clean | No Firebase errors |
+### Deployment
+**Hosted at:** `[DEPLOYMENT_URL_PLACEHOLDER]`  
+**Build Command:** `npm run build`  
+**Dev Server:** `npm run dev`
 
 ---
 
-## 🎯 Features
+## Integration Points
 
-### Authentication (Mock - Production Ready)
-- **Google Sign-In**: Instant authentication as demo user
-- **Email/Password**: Accepts any credentials for training
-- **Microsoft Sign-In**: Mock authentication available
-- **No external APIs required**
-
-### Learning Platform
-- **Dashboard**: User progress overview
-- **Learn**: OWASP Top 10 for LLM Applications (2025)
-- **Play**: CTF-style cybersecurity challenges
-- **Leaderboard**: Track progress and rankings
-- **Profile**: User settings and achievements
-
-### Technical Features
-- React + TypeScript
-- Tailwind CSS v4.0
-- ShadCN UI components
-- Light/Dark mode
-- Responsive design
-- Federal-grade visual identity
-
----
-
-## 📖 Documentation
-
-- **[INSTALLATION.md](./INSTALLATION.md)** - Installation and setup guide
-- **[AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md)** - Complete auth documentation
-- **[ERRORS_FIXED.md](./ERRORS_FIXED.md)** - All resolved issues
-- **[QUICK_FIX_SUMMARY.md](./QUICK_FIX_SUMMARY.md)** - Technical fixes applied
-
----
-
-## 🎨 Design System
-
-### Colors
-- **Primary**: Deep Navy (#0A2342)
-- **Success**: Green (#22C55E)  
-- **Warning**: Amber (#EAB308)
-- **Danger**: Red (#B91C1C)
-- **Accent**: Teal (#00A7A7)
-
-### Theme
-- Light mode: White content cards, cool gray backgrounds
-- Dark mode: Dark navy backgrounds, professional contrast
-- Smooth transitions between modes
-
----
-
-## 🔐 Authentication Flow
-
-```
-1. Landing Page (public)
-   ↓
-2. Click "Get Started"
-   ↓
-3. Auth Modal Opens
-   ↓
-4. Choose auth method:
-   • Google Sign-In → Sarah Chen (demo)
-   • Email/Password → Any credentials
-   • Microsoft → James Wilson (demo)
-   ↓
-5. Authenticated
-   ↓
-6. Redirect to Dashboard
-   ↓
-7. Access protected pages
-```
-
----
-
-## 📱 Pages
-
-### Public
-- **Landing Page** - Hero, features, call-to-action
-
-### Protected (Require Authentication)
-- **Dashboard** - User overview, progress tracking
-- **Learn** - OWASP Top 10 modules with detailed content
-- **Modules** - Individual vulnerability deep-dives
-- **Play** - Interactive CTF challenges
-- **Simulation** - Hands-on lab environments
-- **Vulnerabilities** - Progress tracking by category
-- **Leaderboard** - Rankings and achievements
-- **Profile** - User settings and stats
-
----
-
-## 🛠️ Project Structure
-
-```
-├── App.tsx                 # Main application component
-├── pages/                  # Page components
-│   ├── LandingPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── LearnPage.tsx
-│   ├── ModulePage.tsx
-│   ├── PlayPage.tsx
-│   ├── SimulationPage.tsx
-│   ├── VulnerabilitiesPage.tsx
-│   ├── LeaderboardPage.tsx
-│   └── ProfilePage.tsx
-├── components/
-│   ├── shared/             # Header, Footer
-│   ├── auth/               # AuthModal
-│   ├── play/               # Challenge components
-│   └── ui/                 # ShadCN components
-├── lib/
-│   ├── vulnerabilities.ts  # OWASP Top 10 data
-│   ├── userProgress.ts     # Progress tracking
-│   └── challengeProgress.ts
-├── styles/
-│   └── globals.css         # Tailwind + custom tokens
-└── firebase.ts             # Mock auth (real Firebase in comments)
-```
-
----
-
-## 🧪 Testing the App
-
-### Quick Test (2 minutes)
-
-1. **Open the app**
-   - Should see professional landing page
-   - No console errors
-
-2. **Click "Get Started"**
-   - Auth modal opens
-   - See sign-in options
-
-3. **Click "Continue with Google"**
-   - Logs in as Sarah Chen
-   - Redirects to Dashboard
-
-4. **Navigate pages**
-   - Click "Learn" → See OWASP modules
-   - Click "Play" → See CTF challenges
-   - Click Profile → See user stats
-
-5. **Toggle theme**
-   - Click sun/moon icon
-   - Smooth transition to dark/light mode
-
-✅ If all steps work: **App is perfect!**
-
----
-
-## 🔧 Customization
-
-### Change Mock User Data
-
-Edit `/components/auth/AuthModal.tsx`:
+### Frontend Configuration
+**Location:** `src/firebase.ts`  
+**Type:** Client-side Firebase configuration (public API keys - safe for browser)
 
 ```typescript
-const handleGoogleLogin = async () => {
-  onAuthenticate({
-    name: "Your Name",        // ← Change this
-    email: "your@email.gov",  // ← And this
-  });
-  onClose();
-};
+// Example structure - replace with your actual values
+{
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+}
 ```
 
-### Add Real Firebase (Optional)
-
-See **[AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md)** for detailed instructions.
+⚠️ **Note:** Firebase client-side API keys are safe to expose in frontend code. They are restricted by Firebase Security Rules and authorized domains.
 
 ---
 
-## 🌐 Deployment
+### Backend REST API
+**Location:** `src/utils/api.ts`  
+**Base URL:** `http://localhost:5000/api` (development) or `YOUR_PRODUCTION_API_URL` (production)
 
-### Current Configuration
-✅ **Ready for demo/training environments**
-- No external dependencies
-- No API keys required
-- Works in secure/airgapped networks
-- Perfect for federal environments
-
-### For Production
-Consider integrating:
-- **Login.gov** (official federal SSO)
-- **PIV/CAC cards** (smart card authentication)
-- **SAML/LDAP** (agency directory services)
-- **Azure AD** (Microsoft 365 integration)
+**Endpoints:**
+- `POST /auth/google` - Google OAuth token exchange
+- `POST /auth/microsoft` - Microsoft OAuth token exchange
+- `GET /user/progress` - Fetch user progress
+- `PUT /user/progress` - Update user progress
+- `GET /leaderboard` - Fetch leaderboard data
 
 ---
 
-## 📊 Features by Page
-
-| Page | Features |
-|------|----------|
-| Landing | Hero section, feature cards, theme toggle |
-| Dashboard | Progress overview, quick stats, module cards |
-| Learn | OWASP Top 10, severity badges, completion tracking |
-| Modules | Detailed content, interactive labs, knowledge checks |
-| Play | CTF challenges, hints system, solution reveals |
-| Simulation | Hands-on environments, attack/defense modes |
-| Leaderboard | Rankings, user stats, achievement badges |
-| Profile | User settings, progress charts, edit profile |
+### Database
+**Type:** PostgreSQL (server-side only)  
+**Access:** Backend API handles all database operations  
+**Schema:** Managed by backend team
 
 ---
 
-## 🎓 OWASP Top 10 for LLM (2025)
+### Authentication Flow
+**Provider:** Firebase Authentication  
+**Methods:** Google OAuth, Microsoft OAuth  
+**Token Storage:** JWT tokens stored in localStorage as `usda_token`
 
-The Learn section covers:
-
-1. **LLM01: Prompt Injection**
-2. **LLM02: Sensitive Information Disclosure**
-3. **LLM03: Supply Chain Vulnerabilities**
-4. **LLM04: Data & Model Poisoning**
-5. **LLM05: Improper Output Handling**
-6. **LLM06: Excessive Agency**
-7. **LLM07: System Prompt Leakage**
-8. **LLM08: Vector & Embedding Weaknesses**
-9. **LLM09: Misinformation**
-10. **LLM10: Unbounded Consumption**
-
-Each module includes:
-- Overview and examples
-- Mitigation strategies
-- Interactive labs
-- Knowledge checks
-- Real-world scenarios
+**Flow:**
+1. User clicks Google/Microsoft sign-in
+2. Firebase handles OAuth popup
+3. Frontend exchanges Firebase ID token with backend
+4. Backend validates token and returns JWT
+5. JWT stored locally and used for authenticated API requests
 
 ---
 
-## 🚨 Troubleshooting
+## Environment Variables
 
-### App not loading?
-1. Hard refresh: `Ctrl+Shift+R` or `Cmd+Shift+R`
-2. Check console for errors (F12)
-3. Clear browser cache
+### ⚠️ SECURITY NOTICE
+**No secret values are stored in this codebase.**  
+All sensitive configuration must be set via environment variables.
 
-### Authentication issues?
-- Make sure you're clicking the auth buttons
-- Any email/password works (demo mode)
-- Check `/AUTHENTICATION_GUIDE.md`
-
-### Theme not switching?
-- Try clicking the sun/moon icon again
-- Check if localStorage is enabled
-- Refresh the page
-
-### Firebase errors?
-**You shouldn't see any!** If you do:
-- Check that `/firebase.ts` has mock exports
-- Verify `/components/auth/AuthModal.tsx` doesn't import Firebase
-- See `/ERRORS_FIXED.md`
-
----
-
-## 📝 Recent Updates
-
-### Latest (October 17, 2025)
-✅ **Fixed Firebase unauthorized domain error**
-- Removed Firebase dependency
-- Implemented mock authentication
-- Clean console (no errors)
-- All features working
-
-### Previous
-✅ Added missing routes (SimulationPage, VulnerabilitiesPage)
-✅ Complete dark mode implementation
-✅ Professional background visuals
-✅ Global theme toggle
-
----
-
-## 🤝 Support
-
-For issues or questions:
-
-1. **Check documentation** in `/` directory
-2. **Review console** for any error messages
-3. **Test authentication** with all methods
-4. **Verify routing** by navigating all pages
-
----
-
-## 📄 License
-
-Federal training platform - USDA AI Center of Excellence
-
----
-
-## ⚡ TL;DR
-
+### Frontend (.env)
 ```bash
-# Just run it!
-npm run dev
+# Firebase Configuration (PUBLIC - safe for client-side)
+VITE_FIREBASE_API_KEY=YOUR_API_KEY_HERE
+VITE_FIREBASE_AUTH_DOMAIN=YOUR_PROJECT.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET=YOUR_PROJECT.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=YOUR_MESSAGING_SENDER_ID
+VITE_FIREBASE_APP_ID=YOUR_APP_ID
 
-# Then:
-# 1. Click "Get Started"
-# 2. Click "Continue with Google"
-# 3. Explore the platform!
+# API Configuration
+VITE_API_BASE_URL=http://localhost:5000/api
+```
 
-# No setup. No errors. No problems.
+### Backend (server/.env - PRIVATE)
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+
+# Firebase Admin SDK (SERVER ONLY - NEVER EXPOSE)
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
+
+# JWT
+JWT_SECRET=your-secret-jwt-key-here
+JWT_EXPIRES_IN=7d
+
+# Server
+PORT=5000
+NODE_ENV=production
 ```
 
 ---
 
-**Status**: ✅ Production-ready for demo/training  
-**Authentication**: ✅ Mock (no Firebase needed)  
-**All Features**: ✅ Working  
-**Console**: ✅ Clean (no errors)  
-**Theme**: ✅ Light/Dark mode  
-**Deployment**: ✅ Ready
+## Code Locations Reference
 
-**🎉 Ready to use!**
+### Frontend Public Config
+📄 **File:** `src/firebase.ts`  
+🔓 **Type:** Public API keys (safe to expose)  
+💡 **Usage:** Firebase client SDK initialization
+
+### Backend Private Config
+📄 **Files:**
+- `server/.env` - Environment variables
+- `server/config/serviceAccount.json` - Firebase Admin SDK credentials (NEVER commit)
+
+🔐 **Type:** PRIVATE KEYS (server-only)  
+⚠️ **Security:** Never expose these values. Use server-side environment variables only.
+
+### CI/CD Environment Variables
+**Platforms:** Netlify / Vercel / GitHub Actions  
+**Setup:** Configure secrets in platform settings:
+- Netlify: Site Settings → Environment Variables
+- Vercel: Project Settings → Environment Variables
+- GitHub: Repository Settings → Secrets and Variables
+
+---
+
+## Security Best Practices
+
+### ✅ DO:
+- Store all secrets in environment variables
+- Use `.env` files locally (add to `.gitignore`)
+- Use cloud secret managers for production (AWS Secrets Manager, Google Secret Manager, etc.)
+- Rotate keys regularly
+- Use different credentials for dev/staging/production
+- Enable Firebase Security Rules to restrict client access
+
+### ❌ DON'T:
+- Commit `.env` files to version control
+- Hardcode API keys or secrets in code
+- Share credentials via email or chat
+- Use production credentials in development
+- Expose backend private keys to frontend
+
+---
+
+## Getting Started
+
+1. **Clone the repository**
+   ```bash
+   git clone [REPOSITORY_URL]
+   cd usda-ai-redteam
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual values
+   ```
+
+4. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Build for production**
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+---
+
+## Support
+
+For integration support or questions:
+- Backend API: Contact backend team
+- Firebase Setup: See Firebase Console documentation
+- Deployment: See platform-specific guides (Netlify/Vercel)
+
+---
+
+**Last Updated:** 2025-01-27  
+**Version:** 1.0.0

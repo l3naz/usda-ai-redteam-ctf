@@ -1,8 +1,12 @@
 // API utility functions for backend communication
+// 🔐 ENV PLACEHOLDER — API URL must be configured in environment variables
+// Configure VITE_API_BASE_URL in your .env file (see README.md)
 
 // Safely access environment variables with fallback
 const getApiBaseUrl = (): string => {
   try {
+    // Production: Set VITE_API_BASE_URL in deployment platform (Netlify/Vercel)
+    // Development: Set in .env file
     return import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
   } catch (error) {
     return 'http://localhost:5000/api';
