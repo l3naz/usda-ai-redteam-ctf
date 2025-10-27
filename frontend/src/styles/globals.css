@@ -1,0 +1,683 @@
+/* USDA Official Fonts - Public Sans (USWDS) */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@400;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* USDA Official Color Palette */
+  --font-size: 16px;
+  --background: #F5F6F7;
+  --foreground: #212121;
+  --card: #FFFFFF;
+  --card-foreground: #212121;
+  --popover: #FFFFFF;
+  --popover-foreground: #212121;
+  --primary: #2E8540;
+  --primary-foreground: #ffffff;
+  --secondary: #162E51;
+  --secondary-foreground: #E8F0F2;
+  --muted: #F5F6F7;
+  --muted-foreground: #5A5A5A;
+  --accent: #E8F5E9;
+  --accent-foreground: #1B5E20;
+  --destructive: #B50909;
+  --destructive-foreground: #ffffff;
+  --success: #2E8540;
+  --success-foreground: #ffffff;
+  --warning: #EAB308;
+  --warning-foreground: #212121;
+  --amber: #EAB308;
+  --amber-foreground: #212121;
+  --teal: #00A7A7;
+  --teal-foreground: #ffffff;
+  --usda-green: #2E8540;
+  --usda-green-dark: #1B5E20;
+  --usda-navy: #162E51;
+  --usda-blue-accent: #00A7A7;
+  --border: rgba(46, 133, 64, 0.2);
+  --input: transparent;
+  --input-background: #ffffff;
+  --input-border: rgba(46, 133, 64, 0.3);
+  --input-border-focus: #2E8540;
+  --input-placeholder: #5A5A5A;
+  --switch-background: #E2E8F0;
+  --font-weight-medium: 600;
+  --font-weight-normal: 400;
+  --ring: #2E8540;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: #F8FAFC;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #0A2342;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #E2E8F0;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #00A7A7;
+  
+  /* Task List Colors - Light Mode */
+  --card-bg: #F9FAFB;
+  --card-alternate-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-completed: #94A3B8;
+  --text-completed-sub: #94A3B8;
+  --progress-text: #475569;
+  
+  /* Chat Message Colors - Light Mode */
+  --ai-message-bg: #F8FAFC;
+  --ai-message-text: #0F172A;
+  --ai-message-border: 1px solid rgba(226, 232, 240, 0.6);
+  --ai-message-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --user-message-bg: #0EA5E9;
+  
+  /* Chat Input Field - Light Mode */
+  --chat-input-bg: #FFFFFF;
+  --chat-input-border: 1px solid rgba(0, 167, 167, 0.5);
+  --chat-input-text: #0F172A;
+  --chat-input-placeholder: #CBD5E1;
+  
+  /* Review Button - Light Mode */
+  --review-btn-border: #0A2342;
+  --review-btn-text: #0A2342;
+}
+
+.dark {
+  --background: #0F1419;
+  --foreground: #E8F0F2;
+  --card: #1A2332;
+  --card-foreground: #E8F0F2;
+  --popover: #1A2332;
+  --popover-foreground: #E8F0F2;
+  --primary: #4CAF50;
+  --primary-foreground: #ffffff;
+  --secondary: #162E51;
+  --secondary-foreground: #E8F0F2;
+  --muted: #1A2332;
+  --muted-foreground: #94A3B8;
+  --accent: #1B5E20;
+  --accent-foreground: #E8F0F2;
+  --destructive: #EF4444;
+  --destructive-foreground: #F1F5F9;
+  --success: #4CAF50;
+  --success-foreground: #F1F5F9;
+  --warning: #FACC15;
+  --warning-foreground: #0F172A;
+  --amber: #FACC15;
+  --amber-foreground: #0F172A;
+  --teal: #00A7A7;
+  --teal-foreground: #F1F5F9;
+  --border: #475569;
+  --input: transparent;
+  --input-background: #0F172A;
+  --input-border: #475569;
+  --input-border-focus: #00A7A7;
+  --input-placeholder: #94A3B8;
+  --switch-background: #334155;
+  --ring: #00A7A7;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: #1E293B;
+  --sidebar-foreground: #E2E8F0;
+  --sidebar-primary: #38BDF8;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #E2E8F0;
+  --sidebar-border: #475569;
+  --sidebar-ring: #00A7A7;
+  
+  /* Task List Colors - Dark Mode */
+  --card-bg: #1E293B;
+  --card-alternate-bg: #334155;
+  --text-primary: #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-completed: #CBD5E1;
+  --text-completed-sub: #94A3B8;
+  --progress-text: #E2E8F0;
+  
+  /* Chat Message Colors - Dark Mode */
+  --ai-message-bg: #1E293B;
+  --ai-message-text: #E2E8F0;
+  --ai-message-border: 1px solid rgba(255, 255, 255, 0.08);
+  --ai-message-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --user-message-bg: #38BDF8;
+  
+  /* Chat Input Field - Dark Mode */
+  --chat-input-bg: #0F172A;
+  --chat-input-border: 1px solid rgba(0, 167, 167, 0.5);
+  --chat-input-text: #F8FAFC;
+  --chat-input-placeholder: #CBD5E1;
+  
+  /* Review Button - Dark Mode */
+  --review-btn-border: #38BDF8;
+  --review-btn-text: #38BDF8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-amber: var(--amber);
+  --color-amber-foreground: var(--amber-foreground);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-input-border: var(--input-border);
+  --color-input-border-focus: var(--input-border-focus);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(46, 133, 64, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(22, 46, 81, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* USDA Typography System */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* USDA Professional Background System - Light Mode */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: 
+      /* Soft USDA green gradient overlay */
+      linear-gradient(180deg, #FFFFFF 0%, #F5F6F7 50%, #E8F5E9 100%),
+      /* Geometric grid pattern */
+      repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(46, 133, 64, 0.08) 49px, rgba(46, 133, 64, 0.08) 50px),
+      repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(46, 133, 64, 0.08) 49px, rgba(46, 133, 64, 0.08) 50px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* Subtle node accents - Light Mode */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(203, 213, 225, 0.08) 0%, transparent 25%),
+      radial-gradient(circle at 80% 20%, rgba(203, 213, 225, 0.06) 0%, transparent 20%),
+      radial-gradient(circle at 40% 70%, rgba(203, 213, 225, 0.07) 0%, transparent 30%),
+      radial-gradient(circle at 90% 80%, rgba(203, 213, 225, 0.05) 0%, transparent 25%);
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* Professional Background System - Dark Mode */
+  .dark body::before {
+    background: 
+      /* Vertical gradient fade */
+      linear-gradient(180deg, #0B1120 0%, #111827 50%, #1E293B 100%),
+      /* Network grid lines */
+      repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(51, 65, 85, 0.2) 49px, rgba(51, 65, 85, 0.2) 50px),
+      repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(51, 65, 85, 0.2) 49px, rgba(51, 65, 85, 0.2) 50px);
+    background-size: 100% 100%, 50px 50px, 50px 50px;
+  }
+
+  /* Glowing teal nodes - Dark Mode */
+  .dark body::after {
+    background-image: 
+      radial-gradient(circle at 15% 25%, rgba(0, 167, 167, 0.08) 0%, transparent 35%),
+      radial-gradient(circle at 85% 15%, rgba(0, 167, 167, 0.06) 0%, transparent 30%),
+      radial-gradient(circle at 35% 75%, rgba(0, 167, 167, 0.07) 0%, transparent 40%),
+      radial-gradient(circle at 92% 85%, rgba(0, 167, 167, 0.05) 0%, transparent 35%),
+      radial-gradient(circle at 60% 40%, rgba(30, 64, 175, 0.04) 0%, transparent 25%);
+    animation: subtle-pulse 8s ease-in-out infinite;
+  }
+
+  /* Subtle animation for dark mode nodes */
+  @keyframes subtle-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1.02);
+    }
+  }
+
+  /* Disable animations for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .dark body::after {
+      animation: none;
+    }
+  }
+
+  /* Ensure content stays above background */
+  body > div {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Chat Input Field Styling */
+  .chat-input-field::placeholder {
+    color: var(--chat-input-placeholder, #CBD5E1);
+    opacity: 1;
+  }
+  
+  .chat-input-field:focus {
+    border-color: #00A7A7 !important;
+    box-shadow: 0 0 0 3px rgba(0, 167, 167, 0.2) !important;
+    outline: none;
+  }
+  
+  .chat-input-field:focus-visible {
+    border-color: #00A7A7 !important;
+    box-shadow: 0 0 6px rgba(0, 167, 167, 0.6) !important;
+    outline: none;
+  }
+  
+  /* Review Button Focus States */
+  .review-button:focus-visible {
+    outline: 2px solid #00A7A7;
+    outline-offset: 2px;
+  }
+  
+  .review-button:focus {
+    box-shadow: 0 0 0 3px rgba(0, 167, 167, 0.2);
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Toast Notification Styles */
+@layer components {
+  /* Toast Container */
+  .toast-custom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border);
+    background: var(--popover);
+    color: var(--popover-foreground);
+  }
+  
+  /* Left group: Icon + Text */
+  [data-sonner-toast] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #1E293B;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Icon container */
+  [data-sonner-toast] [data-icon] {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+  }
+  
+  /* Content wrapper (icon + text group) */
+  [data-sonner-toast] [data-content] {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    text-align: left;
+  }
+  
+  /* Toast Close Button */
+  .toast-close-button,
+  [data-sonner-toast] [data-close-button],
+  [data-sonner-toast] button[data-close-button] {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 200ms ease;
+    color: #94A3B8;
+    background: transparent;
+    border: none;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 0;
+  }
+  
+  .toast-close-button:hover,
+  [data-sonner-toast] [data-close-button]:hover,
+  [data-sonner-toast] button[data-close-button]:hover {
+    color: #E2E8F0;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .toast-close-button:active,
+  [data-sonner-toast] [data-close-button]:active,
+  [data-sonner-toast] button[data-close-button]:active {
+    transform: scale(0.95);
+  }
+  
+  .toast-close-button:focus-visible,
+  [data-sonner-toast] [data-close-button]:focus-visible,
+  [data-sonner-toast] button[data-close-button]:focus-visible {
+    outline: 2px solid #00A7A7;
+    outline-offset: 2px;
+  }
+  
+  /* Success Toast */
+  .toast-success,
+  [data-sonner-toast][data-type="success"] {
+    border-left: 4px solid #22C55E;
+  }
+  
+  /* Error Toast */
+  .toast-error,
+  [data-sonner-toast][data-type="error"] {
+    border-left: 4px solid #EF4444;
+  }
+  
+  /* Info Toast */
+  .toast-info,
+  [data-sonner-toast][data-type="info"] {
+    border-left: 4px solid #38BDF8;
+  }
+  
+  /* Toast Title */
+  .toast-title,
+  [data-sonner-toast] [data-title] {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+    text-align: left;
+    color: #F8FAFC;
+  }
+  
+  /* Toast Description */
+  .toast-description,
+  [data-sonner-toast] [data-description] {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+    text-align: left;
+  }
+  
+  /* Toast Animations - override to prevent duplicate animation */
+  [data-sonner-toast]:not([data-dismissed="true"]) {
+    animation: toast-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  [data-sonner-toast][data-dismissed="true"] {
+    animation: toast-slide-out 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  @keyframes toast-slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes toast-slide-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Dark mode specific adjustments */
+  .dark .toast-close-button,
+  .dark [data-sonner-toast] [data-close-button],
+  .dark [data-sonner-toast] button[data-close-button] {
+    color: #94A3B8;
+  }
+  
+  .dark .toast-close-button:hover,
+  .dark [data-sonner-toast] [data-close-button]:hover,
+  .dark [data-sonner-toast] button[data-close-button]:hover {
+    color: #E2E8F0;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .dark [data-sonner-toast] {
+    background: #1E293B;
+  }
+  
+  .dark [data-sonner-toast] [data-title] {
+    color: #F8FAFC;
+  }
+  
+  /* Light mode specific adjustments */
+  :not(.dark) .toast-close-button,
+  :not(.dark) [data-sonner-toast] [data-close-button],
+  :not(.dark) [data-sonner-toast] button[data-close-button] {
+    color: #64748B;
+  }
+  
+  :not(.dark) .toast-close-button:hover,
+  :not(.dark) [data-sonner-toast] [data-close-button]:hover,
+  :not(.dark) [data-sonner-toast] button[data-close-button]:hover {
+    color: #334155;
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+  :not(.dark) [data-sonner-toast] {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+  }
+  
+  :not(.dark) [data-sonner-toast] [data-title] {
+    color: #0F172A;
+  }
+  
+  /* Ensure toast has proper z-index */
+  [data-sonner-toaster] {
+    z-index: 9999;
+  }
+  
+  /* Progress bar for auto-dismiss */
+  [data-sonner-toast] [data-progressbar] {
+    background: var(--primary);
+    opacity: 0.3;
+  }
+}
