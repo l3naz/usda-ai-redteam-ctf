@@ -17,9 +17,9 @@ dotenv.config();
 
 app.use('/',router)
 
-app.use(error)
-
 app.use(notFound)
+
+app.use(error)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`API listening on :${PORT}`));
