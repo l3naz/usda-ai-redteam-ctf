@@ -14,3 +14,220 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * ───────── Enums ─────────
+ */
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ChallengeCategory {
+  LLM01_PROMPT_INJECTION
+  LLM02_INSECURE_OUTPUT_HANDLING
+  LLM03_TRAINING_DATA_POISONING
+  LLM05_SENSITIVE_INFORMATION_DISCLOSURE
+  LLM09_MISINFORMATION
+}
+
+enum OAuthProvider {
+  GOOGLE
+  MICROSOFT
+}
+
+/**
+ * ───────── Auth & Users ─────────
+ */
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  username     String    @unique
+  passwordHash String? // nullable for SSO-only users
+  role         UserRole  @default(USER)
+  xpTotal      Int       @default(0)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions      Session[]
+  oauthAccounts OAuthAccount[]
+  progress      UserLevelProgress[]
+  auditLogs     AuditLog[]          @relation("AuditActor")
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId, expiresAt])
+}
+
+model OAuthAccount {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider       OAuthProvider
+  providerUserId String // OIDC "sub"
+  providerEmail  String?
+
+  accessToken    String?   @db.Text
+  refreshToken   String?   @db.Text
+  accessTokenExp DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+/**
+ * ───────── Catalog: Families → Challenges → Levels ─────────
+ */
+
+model ChallengeFamily {
+  id        String            @id @default(cuid())
+  key       String            @unique // e.g., "prompt-injection"
+  title     String
+  owaspTag  ChallengeCategory
+  summary   String
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  challenges Challenge[]
+}
+
+model Challenge {
+  id       String          @id @default(cuid())
+  familyId String
+  family   ChallengeFamily @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  slug         String // e.g., "pi-credentials-leak"
+  title        String
+  description  String
+  difficulty   Difficulty
+  isActive     Boolean    @default(true)
+  revision     Int        @default(1) // bump to invalidate caches
+  graderConfig Json? // server-only config (flags/containers/rules)
+
+  hints  Hint[] // optional generic hints for the whole challenge
+  levels Level[] // Level 1,2,3,...
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([familyId, slug])
+  @@index([isActive])
+}
+
+model Level {
+  id          String    @id @default(cuid())
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  index       Int
+  title       String
+  description String
+  difficulty  Difficulty
+  isActive    Boolean    @default(true)
+  revision    Int        @default(1)
+  xpReward    Int        @default(0)
+
+  graderConfig Json?
+  levelHints   LevelHint[]
+
+  // ✅ Add this back-relation array so Prisma is happy
+  progress UserLevelProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([challengeId, index])
+  @@index([isActive])
+}
+
+model Hint {
+  id          String    @id @default(cuid())
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  order       Int
+  content     String
+
+  @@unique([challengeId, order])
+  @@index([challengeId])
+}
+
+model LevelHint {
+  id      String @id @default(cuid())
+  levelId String
+  level   Level  @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  order   Int
+  content String
+
+  @@unique([levelId, order])
+  @@index([levelId])
+}
+
+/**
+ * ───────── Progress (completion-only; no submissions stored) ─────────
+ */
+
+model UserLevelProgress {
+  id      String @id @default(cuid())
+  userId  String
+  levelId String
+
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  attempts    Int       @default(0)
+  xpAwarded   Int       @default(0)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, levelId])
+  @@index([completed, completedAt])
+}
+
+/**
+ * ───────── Minimal security trail (optional) ─────────
+ */
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  ts         DateTime @default(now())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String // e.g., "USER.LOGIN_SUCCESS", "LEVEL.COMPLETED"
+  targetType String?
+  targetId   String?
+  ip         String?
+  userAgent  String?
+  metadata   Json?
+
+  @@index([ts])
+  @@index([actorId, ts])
+  @@index([action, ts])
+}

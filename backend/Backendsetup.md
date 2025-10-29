@@ -12,6 +12,15 @@
 ```
 - access the development server at `localhost:3000`
 
+## Env file setup
+
+- create a env file
+- have these two 
+
+```terminal
+   DATABASE_URL=<YOUR URL>
+   GEMINI_API_KEY=<YOUR GEMINI API>
+```
 
 ## Docker setup
 
