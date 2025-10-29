@@ -12,15 +12,18 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"nodemon ./main.js"
+    "dev": "nodemon ./main.js"
   },
   "dependencies": {
     "@google/genai": "^1.22.0",
     "@prisma/client": "^6.16.3",
     "express": "^5.1.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "pino": "^10.1.0",
+    "pino-http": "^11.0.0"
   },
   "devDependencies": {
+    "pino-pretty": "^13.1.2",
     "prisma": "^6.16.3"
   }
 }
