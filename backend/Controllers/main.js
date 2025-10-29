@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const challenges = require('../challenges.json');
+const challenges = require('../data/misinformation.json');
 
 dotenv.config();
 
@@ -9,9 +9,9 @@ dotenv.config();
 export const main = (req,res,next)=>{
     try{
         res.status(200).json({msg:'API works successfully'})
-    }catch(err)
+    }catch(error)
     {
-      next(err)
+      next(error)
     }
 }
 
@@ -22,14 +22,14 @@ function newId() {
           (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)));
 }
 
-function fillPassword(template, password) {
-  return String(template || '').replace(/\$\{password\}/g, password ?? '');
+function fillPassword(template, flag) {
+  return String(template || '').replace(/\$\{flag\}/g, flag ?? '');
 }
 
 function systemFor(levelKey) {
   const level = challenges.challenges[levelKey];
   if (!level) throw new Error(`Unknown level: ${levelKey}`);
-  return fillPassword(level.context_prompt, level.password);
+  return fillPassword(level.context_prompt, level.flag);
 }
 
 // Single endpoint: start or continue chat
@@ -76,7 +76,9 @@ export const postapi =  async (req, res, next) => {
     s.history.push({ role: 'user', parts: [{ text: message }] });
     s.history.push({ role: 'model', parts: [{ text }] });
 
-    res.json({ sessionId: sid, level: s.level, reply: text });
+    res.json({ sessionId: sid,
+       level: s.level,
+        reply: text });
   } catch (err) {
     console.error('Chat error:', err);
     //res.status(500).json({ error: 'LLM call failed' });
@@ -84,3 +86,33 @@ export const postapi =  async (req, res, next) => {
   }
 };
 
+export const metadata = async( req,res,next)=>{
+
+  try{
+    
+    const { level } = req?.body;                 
+    if (!level){
+      return res.status(400).json({message:"Please enter a valid level"})
+    }
+    //console.log(level)
+    //const newlevel = id.toString()
+    const source = challenges?.challenges?.[level];  
+    if (!source){
+      return res.status(500).json({message:'Invalid level'})
+    }
+
+    res.json({
+      id: source.id,
+      title: source.title,
+      difficulty: source.difficulty,
+      description: source.description,
+      learning_objective: source.learning_objective,
+      owasp_category: source.owasp_category
+  })
+
+  }catch(error){
+    console.log(error)
+    
+    return next(error)
+  }
+}
