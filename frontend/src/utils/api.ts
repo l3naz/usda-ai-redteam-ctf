@@ -6,10 +6,10 @@
 const getApiBaseUrl = (): string => {
   try {
     // Production: Set VITE_API_BASE_URL in deployment platform (Netlify/Vercel)
-    // Development: Set in .env file
-    return import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    // Development: Set in .env file or use default backend port
+    return import.meta.env?.VITE_API_BASE_URL || 'http://localhost:5100';
   } catch (error) {
-    return 'http://localhost:5000/api';
+    return 'http://localhost:5100';
   }
 };
 
@@ -87,33 +87,80 @@ async function apiFetch<T>(
 // Authentication API
 // ============================================
 
-export interface FirebaseLoginPayload {
-  token: string;
+export interface SignupPayload {
+  email: string;
+  password: string;
+  fullName?: string;
+  username?: string;
+}
+
+export interface SigninPayload {
+  email: string;
+  password: string;
 }
 
 export interface AuthResponse {
   user: {
-    id: number;
+    id: string;
     name: string;
     email: string;
+    username?: string;
   };
   token: string;
+  message?: string;
 }
 
 /**
- * Send Firebase ID token to backend for authentication
+ * Email/Password Signup
  */
-export async function loginWithFirebase(
-  firebaseToken: string
+export async function signup(
+  payload: SignupPayload
 ): Promise<AuthResponse> {
-  const response = await apiFetch<AuthResponse>('/auth/firebase-login', {
+  const response = await apiFetch<AuthResponse>('/auth/signup', {
     method: 'POST',
-    body: JSON.stringify({ token: firebaseToken }),
+    body: JSON.stringify(payload),
   });
 
   // Store JWT token
   if (response.token) {
     setAuthToken(response.token);
+  }
+
+  // Store user data
+  if (response.user) {
+    localStorage.setItem('userData', JSON.stringify({
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+    }));
+  }
+
+  return response;
+}
+
+/**
+ * Email/Password Signin
+ */
+export async function signin(
+  payload: SigninPayload
+): Promise<AuthResponse> {
+  const response = await apiFetch<AuthResponse>('/auth/signin', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  // Store JWT token
+  if (response.token) {
+    setAuthToken(response.token);
+  }
+
+  // Store user data
+  if (response.user) {
+    localStorage.setItem('userData', JSON.stringify({
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+    }));
   }
 
   return response;
@@ -131,12 +178,34 @@ export async function verifyToken(): Promise<boolean> {
   }
 }
 
+/**
+ * Get current user profile
+ */
+export async function getProfile(): Promise<AuthResponse['user']> {
+  const response = await apiFetch<{ user: AuthResponse['user'] }>('/auth/profile', {
+    method: 'GET',
+  });
+  return response.user;
+}
+
+/**
+ * Logout - clears authentication token and user data
+ * Note: JWT tokens are stateless, so logout is client-side only
+ */
+export async function logout(): Promise<void> {
+  // Clear token and user data from localStorage
+  clearAuthToken();
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userData');
+  }
+}
+
 // ============================================
 // Leaderboard API
 // ============================================
 
 export interface LeaderboardEntry {
-  id: number;
+  id: string | number;
   name: string;
   score: number;
   rank?: number;
@@ -154,16 +223,17 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
 
 /**
  * Update user score on leaderboard
+ * Note: userId is automatically extracted from the JWT token by the backend
  */
 export async function updateLeaderboardScore(
-  userId: number,
+  userId: number | string,
   points: number
 ): Promise<{ success: boolean; newScore?: number }> {
   return apiFetch<{ success: boolean; newScore?: number }>(
     '/leaderboard/update',
     {
       method: 'POST',
-      body: JSON.stringify({ userId, points }),
+      body: JSON.stringify({ points }),
     }
   );
 }

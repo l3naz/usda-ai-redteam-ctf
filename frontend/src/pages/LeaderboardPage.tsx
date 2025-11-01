@@ -69,13 +69,14 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
 
   // Update leaderboard when user completes a module
   const handleScoreUpdate = async (points: number) => {
-    if (!user || !user.id) {
+    if (!user || (!user.id && !user.uid)) {
       toast.error("Please log in to update your score");
       return;
     }
 
     try {
-      await updateLeaderboardScore(user.id, points);
+      // userId is extracted from JWT token by backend, but we pass it for compatibility
+      await updateLeaderboardScore(user.id || user.uid, points);
       toast.success(`+${points} points added!`);
       
       // Refresh leaderboard
@@ -240,7 +241,12 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((entry) => {
-                const isCurrentUser = user && (entry.id === user.id || entry.name === user.displayName);
+                const isCurrentUser = user && (
+                  entry.id === user.id || 
+                  entry.id === user.uid || 
+                  entry.id.toString() === user.uid || 
+                  entry.name === user.displayName
+                );
                 
                 return (
                   <TableRow

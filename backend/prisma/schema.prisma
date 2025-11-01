@@ -37,11 +37,6 @@ enum ChallengeCategory {
   LLM09_MISINFORMATION
 }
 
-enum OAuthProvider {
-  GOOGLE
-  MICROSOFT
-}
-
 /**
  * ───────── Auth & Users ─────────
  */
@@ -49,54 +44,20 @@ enum OAuthProvider {
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
-  username     String    @unique
-  passwordHash String? // nullable for SSO-only users
+  username     String?   @unique // Optional, auto-generated if not provided
+  displayName  String?   // Full name from signup form
+  passwordHash String? // Required for email/password users
   role         UserRole  @default(USER)
   xpTotal      Int       @default(0)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  sessions      Session[]
-  oauthAccounts OAuthAccount[]
   progress      UserLevelProgress[]
   auditLogs     AuditLog[]          @relation("AuditActor")
 
   @@index([role])
   @@index([createdAt])
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String   @unique
-  userAgent String?
-  ip        String?
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([userId, expiresAt])
-}
-
-model OAuthAccount {
-  id     String @id @default(cuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  provider       OAuthProvider
-  providerUserId String // OIDC "sub"
-  providerEmail  String?
-
-  accessToken    String?   @db.Text
-  refreshToken   String?   @db.Text
-  accessTokenExp DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([provider, providerUserId])
-  @@index([userId])
 }
 
 /**

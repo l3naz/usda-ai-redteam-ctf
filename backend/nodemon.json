@@ -1,0 +1,11 @@
+{
+  "watch": ["*.js", "Controllers", "Routes", "Middlewares", "lib"],
+  "ext": "js,json",
+  "ignore": ["node_modules", "generated", "*.test.js"],
+  "exec": "node main.js",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000
+}
+

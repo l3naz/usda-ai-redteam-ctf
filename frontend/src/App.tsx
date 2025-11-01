@@ -97,10 +97,14 @@ function AppContent() {
 
   const handleLoginSuccess = () => {
     // After successful login, redirect to leaderboard
-    handleNavigate("leaderboard");
+    setShowAuthModal(false)
+    handleNavigate("home");
   };
 
   const handleLogout = () => {
+    // Close auth modal if it's open
+    setShowAuthModal(false);
+    // Navigate to landing page
     setCurrentPage("home");
   };
 
@@ -120,9 +124,13 @@ function AppContent() {
   };
 
   // Show auth modal if trying to access protected page without auth
+  // But don't show modal when user just logged out (redirecting to home)
   useEffect(() => {
-    if (protectedPages.includes(currentPage) && !isAuthenticated) {
+    if (protectedPages.includes(currentPage) && !isAuthenticated && currentPage !== "home") {
       setShowAuthModal(true);
+    } else if (currentPage === "home" && !isAuthenticated) {
+      // Explicitly close modal when on landing page
+      setShowAuthModal(false);
     }
   }, [currentPage, isAuthenticated]);
 
@@ -161,12 +169,6 @@ function AppContent() {
           </svg>
         </div>
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleCloseAuthModal}
-      />
 
       {/* Header - Only show when authenticated */}
       {isAuthenticated && (
