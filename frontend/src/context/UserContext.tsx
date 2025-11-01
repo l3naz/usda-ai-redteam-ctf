@@ -8,13 +8,13 @@ import {
   calculateTotalScore
 } from "../lib/userProgress";
 import { toast } from "sonner@2.0.3";
-import { onAuthChanged, signOut as firebaseSignOut, type User as FirebaseUser } from "../firebase";
-import { clearAuthToken, getAuthToken } from "../utils/api";
+import { getHybridCurrentUser, verifyHybridToken, clearHybridAuth } from "../lib/hybridAuth";
+import { getUserData, clearAuth } from "../lib/auth";
 
-// Extended User Type with backend user ID
+// User Type with backend user ID
 export interface User {
-  uid: string; // Firebase UID
-  id?: number; // Backend user ID
+  uid: string; // Backend user ID (used as UID)
+  id?: number; // Backend user ID (parsed as number if possible)
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
@@ -56,62 +56,48 @@ export function UserProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  // Listen to Firebase auth state changes
+  // Check authentication state on mount and when token changes
   useEffect(() => {
-    const unsubscribe = onAuthChanged(async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        // Check if we have a valid backend token
-        const token = getAuthToken();
-        if (token) {
-          // Load user data from localStorage if available
-          const storedUserData = localStorage.getItem("userData");
-          if (storedUserData) {
-            try {
-              const userData = JSON.parse(storedUserData);
-              setUser({
-                uid: firebaseUser.uid,
-                id: userData.id,
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName,
-                photoURL: firebaseUser.photoURL,
-                emailVerified: firebaseUser.emailVerified,
-                isAnonymous: firebaseUser.isAnonymous,
-              });
-            } catch (error) {
-              console.error("Failed to parse stored user data:", error);
-            }
-          } else {
-            // Set Firebase user without backend ID
+    const checkAuth = async () => {
+      try {
+        // Verify token using hybrid auth (tries backend first, falls back to frontend)
+        const isValid = await verifyHybridToken();
+        if (isValid) {
+          // Get current user using hybrid auth
+          const currentUser = await getHybridCurrentUser();
+          if (currentUser) {
+            // Get user ID from result or localStorage token
+            const userId = currentUser.id || localStorage.getItem('usda_token') || '';
+            
             setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName,
-              photoURL: firebaseUser.photoURL,
-              emailVerified: firebaseUser.emailVerified,
-              isAnonymous: firebaseUser.isAnonymous,
+              uid: userId,
+              id: undefined,
+              email: currentUser.email,
+              displayName: currentUser.displayName || currentUser.email.split('@')[0],
+              photoURL: null,
+              emailVerified: true,
+              isAnonymous: false,
             });
+          } else {
+            // No user found, clear auth
+            clearHybridAuth();
+            setUser(null);
           }
         } else {
-          // User is signed in with Firebase but no backend token
-          // This will be handled by the login flow
-          setUser({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-            emailVerified: firebaseUser.emailVerified,
-            isAnonymous: firebaseUser.isAnonymous,
-          });
+          // Token invalid, clear auth
+          clearHybridAuth();
+          setUser(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Auth check error:", error);
+        clearHybridAuth();
         setUser(null);
-        clearAuthToken();
-        localStorage.removeItem("userData");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    checkAuth();
   }, []);
 
   // Persist progress to localStorage whenever it changes
@@ -128,14 +114,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // Logout function
   const logout = async () => {
     try {
-      await firebaseSignOut();
-      clearAuthToken();
-      localStorage.removeItem("userData");
+      // Clear hybrid auth (handles both backend and frontend)
+      clearHybridAuth();
+      
+      // Clear local state
       setUser(null);
+      
       toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Failed to logout");
+      // Even if logout fails, clear local state
+      clearHybridAuth();
+      clearAuth();
+      setUser(null);
+      toast.success("Logged out successfully");
     }
   };
 

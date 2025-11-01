@@ -9,8 +9,6 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { signInWithGoogle, signOut as firebaseSignOut, getFirebaseIdToken } from "../firebase";
-import { loginWithFirebase } from "../utils/api";
 import { toast } from "sonner@2.0.3";
 
 interface LandingPageProps {
@@ -35,105 +33,28 @@ export function LandingPage({
     setIsAuthenticated(!!token);
   }, []);
 
-  // Login handler - Direct Google OAuth
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      // Step 1: Sign in with Google via Firebase
-      const firebaseUser = await signInWithGoogle();
-      
-      if (!firebaseUser) {
-        throw new Error("Firebase authentication failed");
-      }
-
-      // Step 2: Get Firebase ID token
-      const firebaseToken = await getFirebaseIdToken();
-      
-      if (!firebaseToken) {
-        throw new Error("Failed to get Firebase ID token");
-      }
-
-      // Step 3: Exchange Firebase token with backend
-      const response = await loginWithFirebase(firebaseToken);
-
-      // Step 4: Store JWT token
-      localStorage.setItem("usda_token", response.token);
-      
-      // Step 5: Store user data
-      localStorage.setItem("userData", JSON.stringify({
-        id: response.user.id,
-        name: response.user.name,
-        email: response.user.email,
-      }));
-
-      // Update auth state
-      setIsAuthenticated(true);
-      
-      toast.success(`Welcome back, ${response.user.name}!`);
-
-      // Step 6: Redirect to leaderboard
-      setTimeout(() => {
-        window.location.href = "/";
-        onNavigate("leaderboard");
-      }, 500);
-
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      
-      // Handle specific error cases
-      if (error.code === "auth/popup-closed-by-user") {
-        toast.error("Sign-in was cancelled. Please try again.");
-      } else if (error.code === "auth/unauthorized-domain") {
-        // More helpful error message with instructions
-        const currentDomain = window.location.hostname;
-        toast.error(
-          `Domain Authorization Required: "${currentDomain}" must be added to Firebase Console. ` +
-          `Go to Firebase Console → Authentication → Settings → Authorized Domains and add "${currentDomain}".`,
-          { duration: 10000 }
-        );
-        console.error(
-          `\n🔧 FIREBASE CONFIGURATION REQUIRED:\n` +
-          `1. Go to: https://console.firebase.google.com/project/usda-d6adb/authentication/settings\n` +
-          `2. Scroll to "Authorized domains"\n` +
-          `3. Click "Add domain"\n` +
-          `4. Add: "${currentDomain}"\n` +
-          `5. Save and refresh this page\n`
-        );
-      } else {
-        toast.error(error.message || "Login failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+  // Login handler - Open auth modal
+  const handleLogin = () => {
+    if (onOpenAuthModal) {
+      onOpenAuthModal();
     }
   };
 
   // Logout handler
-  const handleLogout = async () => {
-    setLoading(true);
-    try {
-      // Sign out from Firebase
-      await firebaseSignOut();
-      
-      // Clear localStorage
-      localStorage.removeItem("usda_token");
-      localStorage.removeItem("userData");
-      
-      // Update auth state
-      setIsAuthenticated(false);
-      
-      toast.success("Logged out successfully");
-      
-      // Redirect to home
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
-
-    } catch (error) {
-      console.error("Logout failed:", error);
-      toast.error("Logout failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("usda_token");
+    localStorage.removeItem("userData");
+    
+    // Update auth state
+    setIsAuthenticated(false);
+    
+    toast.success("Logged out successfully");
+    
+    // Redirect to home
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
   return (
     <div className="transition-colors duration-200">

@@ -234,7 +234,7 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm truncate text-card-foreground">Completed Membership Inference</p>
-                <p className="text-xs text-muted-foreground">2 days ago</p>
+                <p className="text-xs text-muted-foreground">{"2 days ago"}</p>
               </div>
               <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">90%</span>
             </div>
@@ -244,7 +244,7 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm truncate text-card-foreground">Completed Adversarial Examples</p>
-                <p className="text-xs text-muted-foreground">3 days ago</p>
+                <p className="text-xs text-muted-foreground">{"3 days ago"}</p>
               </div>
               <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">92%</span>
             </div>
@@ -254,7 +254,7 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm truncate text-card-foreground">Completed Data Poisoning</p>
-                <p className="text-xs text-muted-foreground">5 days ago</p>
+                <p className="text-xs text-muted-foreground">{"5 days ago"}</p>
               </div>
               <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">88%</span>
             </div>
