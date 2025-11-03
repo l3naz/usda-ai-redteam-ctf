@@ -19,7 +19,7 @@ interface ModulePageProps {
   vulnerabilityId?: number;
   onModuleComplete?: (moduleId: number, score: number) => void;
   onSectionUpdate?: (moduleId: number, section: 'overview' | 'quickExplainer' | 'mitigation' | 'interactiveLab' | 'quiz') => void;
-  onQuizComplete?: (moduleId: number, score: number) => void;
+  onQuizComplete?: (moduleId: number, score: number, moduleTitle?: string) => void;
   userProgress?: UserProgress;
 }
 
@@ -68,19 +68,15 @@ export function ModulePage({
 
   const handleQuizComplete = (score: number) => {
     if (onQuizComplete && vulnerabilityId) {
-      onQuizComplete(vulnerabilityId, score);
+      onQuizComplete(vulnerabilityId, score, vulnerability?.shortTitle);
       
       const passed = score >= 80;
       if (passed) {
         // Completion toast with celebration
-        toast.success(`🏆 Module Complete — You've mastered ${vulnerability?.shortTitle || 'this module'}!`, {
-          duration: 5000,
-        });
+        toast.success(`🏆 Module Complete — You've mastered ${vulnerability?.shortTitle || 'this module'}!`);
       } else {
         // Encourage to retake
-        toast.info("Complete the assessment quiz with 80% or higher to finalize this module.", {
-          duration: 4000,
-        });
+        toast.info("Complete the assessment quiz with 80% or higher to finalize this module.");
       }
     }
   };

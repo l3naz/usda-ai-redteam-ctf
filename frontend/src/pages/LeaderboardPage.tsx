@@ -48,14 +48,8 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
         toast.success("Leaderboard refreshed");
       }
     } catch (error: any) {
+      // Silently handle errors - fetchLeaderboard already provides fallback mock data
       console.error("Failed to load leaderboard:", error);
-      toast.error("Failed to load leaderboard data");
-      
-      // Fallback to mock data if API fails
-      setLeaderboardData([
-        { id: 1, name: "Admin", score: 200, rank: 1 },
-        { id: 2, name: "Player2", score: 150, rank: 2 },
-      ]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -75,14 +69,17 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
     }
 
     try {
-      await updateLeaderboardScore(user.id, points);
-      toast.success(`+${points} points added!`);
+      const result = await updateLeaderboardScore(user.id, points);
       
-      // Refresh leaderboard
-      await loadLeaderboard();
+      if (result.success) {
+        toast.success(`+${points} points added!`);
+        // Refresh leaderboard
+        await loadLeaderboard();
+      }
     } catch (error: any) {
       console.error("Failed to update score:", error);
-      toast.error("Failed to update leaderboard");
+      // Score is still tracked locally via UserContext
+      toast.info("Score saved locally");
     }
   };
 
@@ -188,10 +185,10 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
         <Card className="p-6 border-2 border-border">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center">
-              <Award className="h-5 w-5" style={{ color: "#00a7a7" }} />
+              <Award className="h-5 w-5 text-teal" />
             </div>
             <div>
-              <p className="text-2xl" style={{ color: "#00a7a7" }}>
+              <p className="text-2xl text-teal">
                 {averageScore}
               </p>
               <p className="text-xs text-muted-foreground">Average Score</p>
@@ -279,8 +276,7 @@ export function LeaderboardPage({ onNavigate }: LeaderboardPageProps) {
                         {isCurrentUser && (
                           <Badge
                             variant="outline"
-                            className="bg-teal/10 border-teal/20"
-                            style={{ color: "#00a7a7" }}
+                            className="bg-teal/10 border-teal/20 text-teal"
                           >
                             You
                           </Badge>

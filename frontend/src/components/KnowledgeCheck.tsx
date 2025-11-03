@@ -6,7 +6,8 @@ import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { ClipboardList, Check, X, RotateCcw, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog";
+import { VisuallyHidden } from "./ui/visually-hidden";
 
 interface Question {
   id: number;
@@ -201,14 +202,17 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
   const allQuestionsAnswered = Object.keys(answeredQuestions).length === questions.length;
 
   return (
-    <section>
+    <section aria-labelledby="knowledge-check-heading">
       {/* Collapsible Header */}
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-        <h2 className="text-primary">Knowledge Check</h2>
+        <h2 id="knowledge-check-heading" className="text-primary">Knowledge Check</h2>
         <Button
           onClick={handleToggleQuiz}
           size="default"
           className="flex items-center gap-2 transition-all duration-200 self-start sm:self-auto"
+          aria-expanded={quizExpanded}
+          aria-controls="quiz-content"
+          aria-label={quizExpanded ? "Hide quiz questions" : "Start quiz - show questions"}
           style={{
             backgroundColor: '#00A7A7',
             color: '#FFFFFF',
@@ -226,12 +230,12 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
           {quizExpanded ? (
             <>
               Hide Quiz
-              <ChevronUp className="h-4 w-4 transition-transform duration-200" />
+              <ChevronUp className="h-4 w-4 transition-transform duration-200" aria-hidden="true" />
             </>
           ) : (
             <>
               Start Quiz
-              <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+              <ChevronDown className="h-4 w-4 transition-transform duration-200" aria-hidden="true" />
             </>
           )}
         </Button>
@@ -239,7 +243,10 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
 
       {/* Expandable Quiz Section */}
       <div
+        id="quiz-content"
         className="overflow-hidden transition-all duration-400"
+        role="region"
+        aria-labelledby="knowledge-check-heading"
         style={{
           maxHeight: quizExpanded ? '10000px' : '0',
           opacity: quizExpanded ? 1 : 0,
@@ -248,7 +255,7 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
       >
         <Card className="p-6 shadow-sm border-border">
           <div className="flex gap-3 mb-6">
-            <ClipboardList className="h-5 w-5 text-primary flex-shrink-0" />
+            <ClipboardList className="h-5 w-5 text-primary flex-shrink-0" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="text-primary mb-2">Assessment Quiz</h3>
               <p className="text-muted-foreground text-sm">
@@ -260,18 +267,27 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
 
           {/* Final Results Banner with Locked Progress Bar */}
           {showFinalResults && (
-            <div className="mb-6 space-y-4 animate-in fade-in duration-300">
+            <div className="mb-6 space-y-4 animate-in fade-in duration-300" role="status" aria-live="polite" aria-atomic="true">
               {/* Progress Bar Summary */}
               <div className="p-4 rounded-lg border" style={{ backgroundColor: '#0B1622', borderColor: passed ? '#22C55E' : '#E74C3C' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm" style={{ color: '#B8C3CC', fontWeight: 500 }}>Final Score</span>
+                  <span className="text-sm" style={{ color: '#B8C3CC', fontWeight: 500 }} id="final-score-label">Final Score</span>
                   <span className="text-sm" style={{ color: passed ? '#22C55E' : '#E74C3C', fontWeight: 600 }}>
-                    {passed ? '✅' : '⚠️'} {score.correctAnswers} of {questions.length} Correct — {score.percentage}%
+                    <span aria-hidden="true">{passed ? '✅' : '⚠️'}</span> {score.correctAnswers} of {questions.length} Correct — {score.percentage}%
                   </span>
                 </div>
                 
                 {/* Final Progress Bar */}
-                <div className="h-2 rounded overflow-hidden" style={{ backgroundColor: '#1E2D3D' }}>
+                <div 
+                  className="h-2 rounded overflow-hidden" 
+                  style={{ backgroundColor: '#1E2D3D' }}
+                  role="progressbar"
+                  aria-valuenow={score.percentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-labelledby="final-score-label"
+                  aria-label={`Quiz final score: ${score.percentage} percent`}
+                >
                   <div
                     className="h-full transition-all duration-500 ease-in-out"
                     style={{
@@ -327,16 +343,28 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                 backgroundColor: flashIncorrect ? 'rgba(231, 76, 60, 0.1)' : '#0B1622',
                 borderColor: flashIncorrect ? '#E74C3C' : 'rgba(255, 255, 255, 0.08)'
               }}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm" style={{ color: '#B8C3CC', fontWeight: 500 }}>Quiz Progress</span>
+                <span className="text-sm" style={{ color: '#B8C3CC', fontWeight: 500 }} id="quiz-progress-label">Quiz Progress</span>
                 <span className="text-sm" style={{ color: '#B8C3CC', fontWeight: 500 }}>
                   {score.correctAnswers} / {questions.length} Correct ({score.percentage}%)
                 </span>
               </div>
               
               {/* Progress Bar */}
-              <div className="h-2 rounded overflow-hidden" style={{ backgroundColor: '#1E2D3D' }}>
+              <div 
+                className="h-2 rounded overflow-hidden" 
+                style={{ backgroundColor: '#1E2D3D' }}
+                role="progressbar"
+                aria-valuenow={score.percentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-labelledby="quiz-progress-label"
+                aria-label={`Quiz progress: ${score.percentage} percent`}
+              >
                 <div
                   className="h-full transition-all duration-500 ease-in-out"
                   style={{
@@ -351,8 +379,8 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
 
               {/* Warning if below passing threshold */}
               {Object.keys(answeredQuestions).length === questions.length && score.percentage < 80 && (
-                <div className="mt-3 flex items-center gap-2 text-sm animate-in fade-in duration-300" style={{ color: '#E74C3C' }}>
-                  <span>⚠️</span>
+                <div className="mt-3 flex items-center gap-2 text-sm animate-in fade-in duration-300" style={{ color: '#E74C3C' }} role="alert">
+                  <span aria-hidden="true">⚠️</span>
                   <span>You need {Math.ceil(questions.length * 0.8)} correct answers ({Math.ceil((questions.length * 0.8 / questions.length) * 100)}%) to pass</span>
                 </div>
               )}
@@ -366,6 +394,14 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
               }
               50% {
                 opacity: 0.8;
+              }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              @keyframes progressPulse {
+                0%, 50%, 100% {
+                  opacity: 1;
+                }
               }
             }
           `}</style>
@@ -395,6 +431,8 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                         : '1px solid rgba(255, 255, 255, 0.08)',
                       borderRadius: '8px'
                     }}
+                    role="group"
+                    aria-labelledby={`question-${question.id}-text`}
                   >
                     {/* Question Header */}
                     <div className="flex items-start gap-3 mb-4">
@@ -406,6 +444,7 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                             : 'var(--primary)',
                           color: '#FFFFFF'
                         }}
+                        aria-hidden="true"
                       >
                         {isAnswered ? (
                           isCorrect ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />
@@ -414,7 +453,7 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="mb-1" style={{ fontWeight: 500 }}>{question.question}</p>
+                        <p id={`question-${question.id}-text`} className="mb-1" style={{ fontWeight: 500 }}>{question.question}</p>
                         <p className="text-xs text-muted-foreground">{question.typeLabel}</p>
                       </div>
                     </div>
@@ -428,6 +467,7 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                           onValueChange={(value) => handleAnswerSelect(question.id, value)}
                           disabled={isAnswered}
                           className="space-y-3"
+                          aria-labelledby={`question-${question.id}-text`}
                         >
                           {question.options.map((option, idx) => {
                             const optionLetter = option.charAt(0);
@@ -474,6 +514,8 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                               onChange={(e) => setUserAnswers(prev => ({ ...prev, [question.id]: e.target.value }))}
                               disabled={isAnswered}
                               className="flex-1"
+                              aria-labelledby={`question-${question.id}-text`}
+                              aria-describedby={isAnswered && isCorrect ? `question-${question.id}-feedback` : undefined}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' && userAnswer && !isAnswered) {
                                   handleAnswerSelect(question.id, userAnswer);
@@ -484,6 +526,7 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                               <Button
                                 onClick={() => handleAnswerSelect(question.id, userAnswer)}
                                 size="default"
+                                aria-label={`Submit answer for question ${question.id}`}
                                 style={{
                                   backgroundColor: '#00A7A7',
                                   color: '#FFFFFF'
@@ -494,8 +537,8 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                             )}
                           </div>
                           {isAnswered && isCorrect && (
-                            <div className="flex items-center gap-2 text-sm text-green-500 animate-in fade-in duration-200">
-                              <Check className="h-4 w-4" />
+                            <div id={`question-${question.id}-feedback`} className="flex items-center gap-2 text-sm text-green-500 animate-in fade-in duration-200" role="status">
+                              <Check className="h-4 w-4" aria-hidden="true" />
                               <span>Correct! Your answer contains the required keywords.</span>
                             </div>
                           )}
@@ -510,9 +553,11 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                               ? 'bg-green-500/10 border-green-500/30' 
                               : 'bg-red-500/10 border-red-500/30'
                           }`}
+                          role="status"
+                          aria-live="polite"
                         >
                           <p className="text-sm mb-2" style={{ fontWeight: 600 }}>
-                            {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+                            <span aria-hidden="true">{isCorrect ? '✓' : '✗'}</span> {isCorrect ? 'Correct!' : 'Incorrect'}
                           </p>
                           {!isCorrect && question.type !== "short" && (
                             <p className="text-sm mb-2">
@@ -543,8 +588,9 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
                 variant="outline"
                 className="w-full gap-2"
                 size="lg"
+                aria-label="Retake quiz and reset all answers"
               >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 Retake Quiz
               </Button>
             </div>
@@ -555,8 +601,16 @@ export function KnowledgeCheck({ onQuizComplete }: KnowledgeCheckProps) {
       {/* Completion Modal */}
       <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
         <DialogContent className="sm:max-w-md border-border">
+          <VisuallyHidden>
+            <DialogTitle>Module Completed</DialogTitle>
+          </VisuallyHidden>
+          <VisuallyHidden>
+            <DialogDescription>
+              You have successfully completed this module. Your progress has been saved.
+            </DialogDescription>
+          </VisuallyHidden>
           <div className="flex flex-col items-center justify-center text-center py-6 px-4">
-            <div className="mb-4 text-5xl">🎉</div>
+            <div className="mb-4 text-5xl" aria-hidden="true">🎉</div>
             <h3 className="mb-3" style={{ color: '#00A884', fontWeight: 600 }}>
               Congratulations! You've successfully completed this module.
             </h3>

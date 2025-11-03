@@ -1,18 +1,24 @@
-import { Shield } from "lucide-react";
+import usdaLogo from "figma:asset/fe46ba86f87cfc9f9ab97c58bcc60686524f146d.png";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-card mt-16 transition-colors duration-200" style={{ borderColor: 'rgba(46, 133, 64, 0.2)' }}>
+    <footer className="border-t bg-card mt-16 transition-colors duration-200" style={{ borderColor: 'rgba(46, 133, 64, 0.2)' }} role="contentinfo">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* USDA Branding */}
           <div className="flex items-center gap-3">
-            <div className="rounded-lg p-2 transition-colors duration-200 shadow-sm" style={{ backgroundColor: '#2E8540' }}>
-              <Shield className="h-8 w-8 text-white" />
-            </div>
+            <img 
+              src={usdaLogo} 
+              alt="USDA – United States Department of Agriculture"
+              className="transition-opacity duration-200 hover:opacity-90"
+              style={{ 
+                width: '45px', 
+                height: 'auto',
+                objectFit: 'contain'
+              }}
+            />
             <div>
-              <p className="text-sm transition-colors duration-200" style={{ 
-                color: 'var(--foreground)', 
+              <p className="text-sm transition-colors duration-200 text-foreground" style={{ 
                 fontFamily: 'Public Sans, sans-serif',
                 fontWeight: 700,
                 textTransform: 'uppercase',
@@ -28,60 +34,40 @@ export function Footer() {
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+          <nav className="flex flex-wrap gap-6 text-sm text-muted-foreground" aria-label="Footer navigation">
             <a 
               href="#" 
-              className="transition-colors duration-200"
+              className="transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded px-1 hover:text-success dark:hover:text-teal"
               style={{ fontFamily: 'Source Sans Pro, sans-serif' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#2E8540';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '';
-              }}
+              aria-label="Privacy Policy"
             >
               Privacy Policy
             </a>
             <a 
               href="#" 
-              className="transition-colors duration-200"
+              className="transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded px-1 hover:text-success dark:hover:text-teal"
               style={{ fontFamily: 'Source Sans Pro, sans-serif' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#2E8540';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '';
-              }}
+              aria-label="Terms of Service"
             >
               Terms of Service
             </a>
             <a 
               href="#" 
-              className="transition-colors duration-200"
+              className="transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded px-1 hover:text-success dark:hover:text-teal"
               style={{ fontFamily: 'Source Sans Pro, sans-serif' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#2E8540';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '';
-              }}
+              aria-label="Section 508 Accessibility Statement"
             >
               Accessibility
             </a>
             <a 
               href="#" 
-              className="transition-colors duration-200"
+              className="transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded px-1 hover:text-success dark:hover:text-teal"
               style={{ fontFamily: 'Source Sans Pro, sans-serif' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#2E8540';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = '';
-              }}
+              aria-label="Contact Support"
             >
               Contact Support
             </a>
-          </div>
+          </nav>
         </div>
 
         <div className="mt-6 pt-6 text-center text-xs text-muted-foreground transition-colors duration-200" style={{ borderTop: '1px solid rgba(46, 133, 64, 0.2)' }}>

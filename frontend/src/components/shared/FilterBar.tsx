@@ -23,11 +23,12 @@ export function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
           <button
             key={filter.id}
             onClick={() => onFilterChange(filter.id)}
-            className="px-4 py-2 rounded-lg transition-all duration-300"
+            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+              isActive 
+                ? 'bg-success dark:bg-teal text-white' 
+                : 'bg-card dark:bg-card text-primary dark:text-slate-200 border border-primary dark:border-slate-600'
+            }`}
             style={{
-              backgroundColor: isActive ? '#2E8540' : '#FFFFFF',
-              color: isActive ? '#FFFFFF' : '#162E51',
-              border: isActive ? 'none' : '1px solid #162E51',
               fontFamily: 'Public Sans, sans-serif',
               fontWeight: 600,
               fontSize: '0.875rem',
@@ -36,15 +37,11 @@ export function FilterBar({ activeFilter, onFilterChange }: FilterBarProps) {
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = 'rgba(46, 133, 64, 0.08)';
-                e.currentTarget.style.color = '#2E8540';
                 e.currentTarget.style.transform = 'scale(1.01)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#FFFFFF';
-                e.currentTarget.style.color = '#162E51';
                 e.currentTarget.style.transform = 'scale(1)';
               } else {
                 e.currentTarget.style.transform = 'scale(1.02)';

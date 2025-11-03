@@ -123,21 +123,20 @@ export function PlayPage({ onNavigate }: PlayPageProps) {
       {/* Header Section */}
       <div className="mb-6">
         <h1
-          className="mb-2"
+          className="mb-2 text-primary dark:text-white"
           style={{
             fontSize: '2rem',
             fontFamily: 'Source Sans Pro, sans-serif',
             fontWeight: 700,
-            color: '#162E51',
           }}
         >
           Play Challenges
         </h1>
         <p
+          className="text-muted-foreground dark:text-slate-300"
           style={{
             fontFamily: 'Source Sans Pro, sans-serif',
             fontSize: '1rem',
-            color: '#475569',
           }}
         >
           Test your skills with hands-on security challenges.

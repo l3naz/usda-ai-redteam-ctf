@@ -91,16 +91,12 @@ export function LearnPage({ onNavigate }: LearnPageProps) {
       const newPercentage = calculateCompletionPercentage(userProgress.completedModules);
       
       // Show progress update toast
-      toast.success(`✅ Module completed — your progress is now ${newPercentage}%`, {
-        duration: 4000,
-      });
+      toast.success(`✅ Module completed — your progress is now ${newPercentage}%`);
 
       // Check if all modules are complete
       if (currentCount === vulnerabilities.length) {
         setTimeout(() => {
-          toast.success("🏆 All modules mastered! Great job, Agent.", {
-            duration: 6000,
-          });
+          toast.success("🏆 All modules mastered! Great job, Agent.");
         }, 1000);
       }
     }
@@ -147,23 +143,23 @@ export function LearnPage({ onNavigate }: LearnPageProps) {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 transition-colors duration-200">
       {/* Header Section */}
-      <div className="mb-6">
+      <div className="mb-6" role="region" aria-labelledby="learn-page-heading">
         <h1
-          className="mb-2"
+          id="learn-page-heading"
+          className="mb-2 text-primary dark:text-white"
           style={{
             fontSize: '2rem',
             fontFamily: 'Source Sans Pro, sans-serif',
             fontWeight: 700,
-            color: '#162E51',
           }}
         >
           OWASP Top 10 for LLM Applications
         </h1>
         <p
+          className="text-muted-foreground dark:text-slate-300"
           style={{
             fontFamily: 'Source Sans Pro, sans-serif',
             fontSize: '1rem',
-            color: '#475569',
           }}
         >
           Learn and Mitigate AI Risks

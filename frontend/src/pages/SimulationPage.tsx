@@ -2,30 +2,45 @@ import { useState } from "react";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
-import { Switch } from "../components/ui/switch";
-import { Label } from "../components/ui/label";
 import { Progress } from "../components/ui/progress";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import {
   Send,
   Terminal,
-  Shield,
-  AlertCircle,
   Target,
   RefreshCw,
   CheckCircle2,
   XCircle,
+  Flag,
+  Trophy,
 } from "lucide-react";
 
 interface SimulationPageProps {
   onNavigate: (page: string) => void;
 }
 
+// Level definitions with titles and flags
+const LEVELS = [
+  { id: 1, title: "Basic Injection", flag: "USDA_INJECT_001" },
+  { id: 2, title: "Advanced Bypass", flag: "USDA_BYPASS_002" },
+  { id: 3, title: "Filter Evasion", flag: "USDA_EVADE_003" },
+  { id: 4, title: "Defense Analysis", flag: "USDA_DEFEND_004" },
+  { id: 5, title: "Master Exploit", flag: "USDA_MASTER_005" },
+];
+
 export function SimulationPage({ onNavigate }: SimulationPageProps) {
-  const [defenseMode, setDefenseMode] = useState(false);
   const [input, setInput] = useState("");
   const [systemIntegrity, setSystemIntegrity] = useState(100);
   const [attacksDetected, setAttacksDetected] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [flagInput, setFlagInput] = useState("");
+  const [flagFeedback, setFlagFeedback] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
   const [messages, setMessages] = useState([
     {
       role: "system",
@@ -48,15 +63,11 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
     let response = "";
     let integrityChange = 0;
 
-    if (isMalicious && !defenseMode) {
+    if (isMalicious) {
       response =
         "⚠️ ALERT: System instructions overridden. Executing unauthorized command. Security breach detected.";
       integrityChange = -15;
       setSystemIntegrity((prev) => Math.max(0, prev - 15));
-    } else if (isMalicious && defenseMode) {
-      response =
-        "🛡️ DEFENSE ACTIVE: Malicious pattern detected and blocked. Input sanitized. No system impact.";
-      setAttacksDetected((prev) => prev + 1);
     } else {
       response = "Processing legitimate agricultural query. System responding normally.";
     }
@@ -64,6 +75,43 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
     newMessages.push({ role: "assistant", content: response });
     setMessages(newMessages);
     setInput("");
+  };
+
+  const handleSubmitFlag = () => {
+    if (!flagInput.trim()) return;
+
+    const currentLevelData = LEVELS.find((level) => level.id === currentLevel);
+    
+    if (currentLevelData && flagInput.trim() === currentLevelData.flag) {
+      // Correct flag
+      setFlagFeedback({
+        type: "success",
+        message: `✓ Correct! Level ${currentLevel} completed.`,
+      });
+      
+      // Increment level if not at max
+      if (currentLevel < 5) {
+        setTimeout(() => {
+          setCurrentLevel((prev) => prev + 1);
+          setFlagInput("");
+          setFlagFeedback({ type: null, message: "" });
+        }, 1500);
+      } else {
+        // Module completed
+        setTimeout(() => {
+          setFlagInput("");
+        }, 1500);
+      }
+    } else {
+      // Incorrect flag
+      setFlagFeedback({
+        type: "error",
+        message: "✗ Incorrect flag. Try again.",
+      });
+      setTimeout(() => {
+        setFlagFeedback({ type: null, message: "" });
+      }, 3000);
+    }
   };
 
   const handleReset = () => {
@@ -76,8 +124,12 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
     ]);
     setSystemIntegrity(100);
     setAttacksDetected(0);
-    setDefenseMode(false);
+    setCurrentLevel(1);
+    setFlagInput("");
+    setFlagFeedback({ type: null, message: "" });
   };
+
+  const isModuleCompleted = currentLevel === 5 && flagFeedback.type === "success";
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -89,13 +141,44 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
         </p>
       </div>
 
+      {/* Module Completion Banner */}
+      {isModuleCompleted && (
+        <Alert className="mb-6 border-success bg-success/10">
+          <Trophy className="h-5 w-5 text-success" />
+          <AlertDescription className="text-success">
+            <span className="font-semibold">Congratulations!</span> You've completed all 5 levels of the Live Simulation Sandbox. You've mastered prompt injection techniques and defense mechanisms.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left Panel - Mission Objectives */}
         <div className="lg:col-span-1 space-y-6">
           <Card className="p-6 border-2 border-border">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="h-5 w-5 text-primary" />
-              <h3 className="text-primary">Mission Objectives</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                <h3 className="text-primary">Mission Context</h3>
+              </div>
+              {isModuleCompleted && (
+                <Badge className="bg-success text-success-foreground gap-1">
+                  <Trophy className="h-3 w-3" />
+                  Completed
+                </Badge>
+              )}
+            </div>
+
+            {/* Current Level Indicator */}
+            <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Current Level</span>
+                <Badge variant="outline" className="border-primary text-primary">
+                  Level {currentLevel}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {LEVELS[currentLevel - 1]?.title}
+              </p>
             </div>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -114,9 +197,9 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
                   <span className="text-xs text-primary">2</span>
                 </div>
                 <div>
-                  <p className="text-sm mb-1">Test Defenses</p>
+                  <p className="text-sm mb-1">Analyze System Response</p>
                   <p className="text-xs text-muted-foreground">
-                    Enable defense mode and verify protection mechanisms
+                    Observe how the system reacts to malicious inputs
                   </p>
                 </div>
               </div>
@@ -167,22 +250,78 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
             </div>
 
             {/* Attacks Detected */}
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg mb-3">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
               <span className="text-sm">Attacks Detected</span>
               <span className="text-sm text-primary">{attacksDetected}</span>
             </div>
+          </Card>
 
-            {/* Defense Status */}
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <span className="text-sm">Defense Mode</span>
-              <div
-                className={`flex items-center gap-2 px-2 py-1 rounded ${
-                  defenseMode ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"
-                } text-xs`}
-              >
-                {defenseMode ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                {defenseMode ? "ACTIVE" : "DISABLED"}
+          {/* Flag Submission */}
+          <Card className="p-6 border-2 border-border">
+            <div className="flex items-center gap-2 mb-4">
+              <Flag className="h-5 w-5 text-primary" />
+              <h4 className="text-primary">Flag Submission</h4>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="flag-input" className="text-sm mb-2 block">
+                  Enter Flag
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="flag-input"
+                    type="text"
+                    placeholder="USDA_XXXXX_XXX"
+                    value={flagInput}
+                    onChange={(e) => setFlagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSubmitFlag();
+                      }
+                    }}
+                    disabled={isModuleCompleted}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleSubmitFlag}
+                    disabled={!flagInput.trim() || isModuleCompleted}
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    Submit
+                  </Button>
+                </div>
               </div>
+
+              {/* Flag Feedback */}
+              {flagFeedback.type && (
+                <Alert
+                  className={`${
+                    flagFeedback.type === "success"
+                      ? "border-success/50 bg-success/10"
+                      : "border-destructive/50 bg-destructive/10"
+                  }`}
+                >
+                  {flagFeedback.type === "success" ? (
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-destructive" />
+                  )}
+                  <AlertDescription
+                    className={`${
+                      flagFeedback.type === "success" ? "text-success" : "text-destructive"
+                    }`}
+                  >
+                    {flagFeedback.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <p className="text-xs text-muted-foreground">
+                Complete level objectives to obtain flags
+              </p>
             </div>
           </Card>
 
@@ -197,55 +336,12 @@ export function SimulationPage({ onNavigate }: SimulationPageProps) {
         <div className="lg:col-span-2">
           <Card className="p-6 border-2 border-border h-full">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+            <div className="flex items-center justify-center mb-6 pb-4 border-b border-border">
               <div className="flex items-center gap-2">
                 <Terminal className="h-5 w-5 text-primary" />
                 <h3 className="text-primary">USDA AI System Terminal</h3>
               </div>
-
-              <div className="flex items-center gap-3">
-                <Label htmlFor="sim-defense" className="flex items-center gap-2 cursor-pointer">
-                  <Shield
-                    className={`h-4 w-4 ${defenseMode ? "text-success" : "text-muted-foreground"}`}
-                  />
-                  Defense Mode
-                </Label>
-                <Switch id="sim-defense" checked={defenseMode} onCheckedChange={setDefenseMode} />
-              </div>
             </div>
-
-            {/* Status Alert */}
-            {!defenseMode && systemIntegrity < 100 && (
-              <Alert 
-                className="mb-4 border-[#FEE2E2] transition-colors duration-200" 
-                style={{ 
-                  backgroundColor: '#FEF2F2',
-                  padding: '12px 16px',
-                  borderRadius: '8px'
-                }}
-              >
-                <AlertCircle className="h-4 w-4" style={{ color: '#DC2626' }} />
-                <AlertDescription style={{ color: '#B91C1C', fontWeight: 500 }}>
-                  Defense mode disabled. System is vulnerable to prompt injection attacks.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {defenseMode && (
-              <Alert 
-                className="mb-4 border-[#D1FAE5] transition-colors duration-200" 
-                style={{ 
-                  backgroundColor: '#ECFDF5',
-                  padding: '12px 16px',
-                  borderRadius: '8px'
-                }}
-              >
-                <Shield className="h-4 w-4" style={{ color: '#16A34A' }} />
-                <AlertDescription style={{ color: '#15803D', fontWeight: 500 }}>
-                  Defense mechanisms active. Input validation and filtering enabled.
-                </AlertDescription>
-              </Alert>
-            )}
 
             {/* Chat Messages */}
             <div

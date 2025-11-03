@@ -9,9 +9,9 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { signInWithGoogle, signOut as firebaseSignOut, getFirebaseIdToken } from "../firebase";
-import { loginWithFirebase } from "../utils/api";
+import { clearAuthToken } from "../utils/api";
 import { toast } from "sonner@2.0.3";
+import usdaLogo from "figma:asset/fe46ba86f87cfc9f9ab97c58bcc60686524f146d.png";
 
 interface LandingPageProps {
   onNavigate: (page: string) => void;
@@ -35,75 +35,10 @@ export function LandingPage({
     setIsAuthenticated(!!token);
   }, []);
 
-  // Login handler - Direct Google OAuth
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      // Step 1: Sign in with Google via Firebase
-      const firebaseUser = await signInWithGoogle();
-      
-      if (!firebaseUser) {
-        throw new Error("Firebase authentication failed");
-      }
-
-      // Step 2: Get Firebase ID token
-      const firebaseToken = await getFirebaseIdToken();
-      
-      if (!firebaseToken) {
-        throw new Error("Failed to get Firebase ID token");
-      }
-
-      // Step 3: Exchange Firebase token with backend
-      const response = await loginWithFirebase(firebaseToken);
-
-      // Step 4: Store JWT token
-      localStorage.setItem("usda_token", response.token);
-      
-      // Step 5: Store user data
-      localStorage.setItem("userData", JSON.stringify({
-        id: response.user.id,
-        name: response.user.name,
-        email: response.user.email,
-      }));
-
-      // Update auth state
-      setIsAuthenticated(true);
-      
-      toast.success(`Welcome back, ${response.user.name}!`);
-
-      // Step 6: Redirect to leaderboard
-      setTimeout(() => {
-        window.location.href = "/";
-        onNavigate("leaderboard");
-      }, 500);
-
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      
-      // Handle specific error cases
-      if (error.code === "auth/popup-closed-by-user") {
-        toast.error("Sign-in was cancelled. Please try again.");
-      } else if (error.code === "auth/unauthorized-domain") {
-        // More helpful error message with instructions
-        const currentDomain = window.location.hostname;
-        toast.error(
-          `Domain Authorization Required: "${currentDomain}" must be added to Firebase Console. ` +
-          `Go to Firebase Console → Authentication → Settings → Authorized Domains and add "${currentDomain}".`,
-          { duration: 10000 }
-        );
-        console.error(
-          `\n🔧 FIREBASE CONFIGURATION REQUIRED:\n` +
-          `1. Go to: https://console.firebase.google.com/project/usda-d6adb/authentication/settings\n` +
-          `2. Scroll to "Authorized domains"\n` +
-          `3. Click "Add domain"\n` +
-          `4. Add: "${currentDomain}"\n` +
-          `5. Save and refresh this page\n`
-        );
-      } else {
-        toast.error(error.message || "Login failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+  // Login handler - Opens auth modal
+  const handleLogin = () => {
+    if (onOpenAuthModal) {
+      onOpenAuthModal();
     }
   };
 
@@ -111,11 +46,8 @@ export function LandingPage({
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // Sign out from Firebase
-      await firebaseSignOut();
-      
-      // Clear localStorage
-      localStorage.removeItem("usda_token");
+      // Clear authentication
+      clearAuthToken();
       localStorage.removeItem("userData");
       
       // Update auth state
@@ -136,19 +68,28 @@ export function LandingPage({
     }
   };
   return (
-    <div className="transition-colors duration-200">
+    <div className="transition-colors duration-200" lang="en">
       {/* Pre-Login Header with Theme Toggle */}
-      <header className="sticky top-0 z-50 bg-[#0A2342] dark:bg-[#0B1120] border-b border-white/10 shadow-sm transition-colors duration-200">
+      <header className="sticky top-0 z-50 bg-[#0A2342] dark:bg-[#0B1120] border-b border-white/10 shadow-sm transition-colors duration-200" role="banner">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <button
               onClick={() => onNavigate("home")}
-              className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+              className="flex items-center hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2342] rounded-lg"
+              aria-label="USDA AI Red Team Training Game home"
+              style={{ gap: '10px' }}
             >
-              <div className="bg-white rounded-lg p-2">
-                <Shield className="h-6 w-6 text-[#0A2342]" />
-              </div>
+              <img 
+                src={usdaLogo} 
+                alt="USDA – United States Department of Agriculture"
+                className="transition-transform duration-200 hover:scale-105 dark:drop-shadow-md"
+                style={{ 
+                  width: '42px', 
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
               <div className="text-left">
                 <h1 className="text-white text-xl">
                   USDA AI Red Team Training Game
@@ -164,12 +105,14 @@ export function LandingPage({
               {/* Theme Toggle */}
               <button
                 onClick={onToggleTheme}
-                className="rounded-full p-2 transition-all duration-200 hover:bg-white/10"
+                className="rounded-full p-2 transition-all duration-200 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2342]"
                 aria-label={
                   isDarkMode
                     ? "Switch to Light Mode"
                     : "Switch to Dark Mode"
                 }
+                aria-pressed={isDarkMode}
+                role="switch"
                 title={
                   isDarkMode
                     ? "Switch to Light Mode"
@@ -177,9 +120,9 @@ export function LandingPage({
                 }
               >
                 {isDarkMode ? (
-                  <Sun className="h-5 w-5 text-teal transition-all" />
+                  <Sun className="h-5 w-5 text-teal transition-all" aria-hidden="true" />
                 ) : (
-                  <Moon className="h-5 w-5 text-white transition-all" />
+                  <Moon className="h-5 w-5 text-white transition-all" aria-hidden="true" />
                 )}
               </button>
 
@@ -189,10 +132,11 @@ export function LandingPage({
                 <button
                   onClick={handleLogout}
                   disabled={loading}
-                  className="bg-transparent border-2 border-[#007A33] hover:bg-[#007A33] text-[#007A33] hover:text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-transparent border-2 border-[#007A33] hover:bg-[#007A33] text-[#007A33] hover:text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2342]"
                   style={{
                     fontWeight: 600,
                   }}
+                  aria-label={loading ? "Logging out, please wait" : "Log out of your account"}
                 >
                   {loading ? "Logging out..." : "Logout"}
                 </button>
@@ -201,10 +145,11 @@ export function LandingPage({
                 <button
                   onClick={handleLogin}
                   disabled={loading}
-                  className="bg-[#007A33] hover:bg-[#00612A] text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#007A33] hover:bg-[#00612A] text-white px-4 py-2 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A2342]"
                   style={{
                     fontWeight: 600,
                   }}
+                  aria-label={loading ? "Logging in, please wait" : "Log in to your account"}
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
@@ -215,13 +160,13 @@ export function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-[#00274C] dark:bg-[#1E293B] py-20 transition-colors duration-200">
+      <section className="relative bg-[#00274C] dark:bg-[#1E293B] py-20 transition-colors duration-200" aria-labelledby="hero-heading">
         {/* Optional overlay - very subtle to keep background visible */}
-        <div className="absolute inset-0 bg-black/10 dark:bg-black/20 transition-opacity duration-200"></div>
+        <div className="absolute inset-0 bg-black/10 dark:bg-black/20 transition-opacity duration-200" aria-hidden="true"></div>
         
         {/* Content with proper z-index to ensure text is above overlay */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl mb-6 text-white">
+          <h1 id="hero-heading" className="text-5xl mb-6 text-white">
             Test. Break. Defend. Strengthen AI Systems.
           </h1>
           <p className="text-xl text-gray-200 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -235,6 +180,7 @@ export function LandingPage({
               size="lg"
               onClick={() => onOpenAuthModal && onOpenAuthModal()}
               className="text-lg px-8 transition-colors duration-200"
+              aria-label="Get started with USDA AI Red Team Training"
               style={{
                 backgroundColor: '#007A33',
                 color: '#FFFFFF',

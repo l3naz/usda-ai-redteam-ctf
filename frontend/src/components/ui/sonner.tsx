@@ -1,17 +1,20 @@
 "use client";
 
-import { useTheme } from "next-themes@0.4.6";
 import { Toaster as Sonner, ToasterProps } from "sonner@2.0.3";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
+  // Detect theme from document class
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const theme = isDarkMode ? 'dark' : 'light';
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={theme}
       className="toaster group"
       closeButton={true}
-      duration={4000}
+      duration={2000}
+      position="top-center"
+      offset="20px"
       style={
         {
           "--normal-bg": "var(--popover)",
@@ -28,6 +31,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           success: "toast-success",
           error: "toast-error",
           info: "toast-info",
+          warning: "toast-warning",
         },
       }}
       {...props}

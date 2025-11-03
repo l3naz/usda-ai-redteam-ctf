@@ -5,21 +5,18 @@ import {
   saveProgressToStorage,
   updateModuleSection,
   completeModuleQuiz,
-  calculateTotalScore
+  calculateTotalScore,
+  addChallengeActivity
 } from "../lib/userProgress";
 import { toast } from "sonner@2.0.3";
-import { onAuthChanged, signOut as firebaseSignOut, type User as FirebaseUser } from "../firebase";
-import { clearAuthToken, getAuthToken } from "../utils/api";
+import { clearAuthToken, getAuthToken, verifyToken } from "../utils/api";
 
-// Extended User Type with backend user ID
+// User Type
 export interface User {
-  uid: string; // Firebase UID
-  id?: number; // Backend user ID
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  emailVerified: boolean;
-  isAnonymous: boolean;
+  id: number; // Backend user ID
+  email: string;
+  displayName: string;
+  photoURL?: string | null;
 }
 
 interface UserContextType {
@@ -29,7 +26,8 @@ interface UserContextType {
   logout: () => Promise<void>;
   userProgress: UserProgress;
   updateProgress: (moduleId: number, section: keyof UserProgress['moduleProgress'][number]['sectionsCompleted']) => void;
-  completeQuiz: (moduleId: number, score: number) => void;
+  completeQuiz: (moduleId: number, score: number, moduleTitle?: string) => void;
+  addActivity: (challengeTitle: string, score: number) => void;
   resetProgress: () => void;
 }
 
@@ -52,66 +50,51 @@ export function UserProvider({ children }: { children: ReactNode }) {
       rank: 0,
       lastActivityDate: new Date().toISOString(),
       moduleProgress: {},
-      quizScores: {},
+      recentActivities: [],
     };
   });
 
-  // Listen to Firebase auth state changes
+  // Check authentication state on mount
   useEffect(() => {
-    const unsubscribe = onAuthChanged(async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        // Check if we have a valid backend token
-        const token = getAuthToken();
-        if (token) {
-          // Load user data from localStorage if available
+    const initAuth = async () => {
+      const token = getAuthToken();
+      
+      if (token) {
+        // Verify token with backend
+        const isValid = await verifyToken();
+        
+        if (isValid) {
+          // Load user data from localStorage
           const storedUserData = localStorage.getItem("userData");
           if (storedUserData) {
             try {
               const userData = JSON.parse(storedUserData);
               setUser({
-                uid: firebaseUser.uid,
                 id: userData.id,
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName,
-                photoURL: firebaseUser.photoURL,
-                emailVerified: firebaseUser.emailVerified,
-                isAnonymous: firebaseUser.isAnonymous,
+                email: userData.email,
+                displayName: userData.name || userData.displayName,
+                photoURL: userData.photoURL || null,
               });
             } catch (error) {
               console.error("Failed to parse stored user data:", error);
+              clearAuthToken();
+              localStorage.removeItem("userData");
             }
           } else {
-            // Set Firebase user without backend ID
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName,
-              photoURL: firebaseUser.photoURL,
-              emailVerified: firebaseUser.emailVerified,
-              isAnonymous: firebaseUser.isAnonymous,
-            });
+            // Token exists but no user data - clear and require re-login
+            clearAuthToken();
           }
         } else {
-          // User is signed in with Firebase but no backend token
-          // This will be handled by the login flow
-          setUser({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-            emailVerified: firebaseUser.emailVerified,
-            isAnonymous: firebaseUser.isAnonymous,
-          });
+          // Token invalid - clear it
+          clearAuthToken();
+          localStorage.removeItem("userData");
         }
-      } else {
-        setUser(null);
-        clearAuthToken();
-        localStorage.removeItem("userData");
       }
+      
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    initAuth();
   }, []);
 
   // Persist progress to localStorage whenever it changes
@@ -128,11 +111,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // Logout function
   const logout = async () => {
     try {
-      await firebaseSignOut();
       clearAuthToken();
       localStorage.removeItem("userData");
       setUser(null);
-      toast.success("Logged out successfully");
+      toast.success("Signed out successfully");
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Failed to logout");
@@ -151,23 +133,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   // Complete quiz with score
-  const completeQuiz = (moduleId: number, score: number) => {
+  const completeQuiz = (moduleId: number, score: number, moduleTitle?: string) => {
     setUserProgress(prev => {
       const wasCompleted = prev.completedModules.includes(moduleId);
-      const updated = completeModuleQuiz(prev, moduleId, score);
+      const updated = completeModuleQuiz(prev, moduleId, score, moduleTitle);
       const nowCompleted = updated.completedModules.includes(moduleId);
       
       // Show toast notification if module just completed
       if (!wasCompleted && nowCompleted && score >= 80) {
         setTimeout(() => {
-          toast.success(`✅ Module completed! Progress: ${updated.completedModules.length}/10 modules (${Math.round((updated.completedModules.length / 10) * 100)}%)`, {
-            duration: 4000,
-          });
+          toast.success(`✅ Module completed! Progress: ${updated.completedModules.length}/10 modules (${Math.round((updated.completedModules.length / 10) * 100)}%)`);
         }, 500);
       }
       
       return updated;
     });
+  };
+
+  // Add challenge activity
+  const addActivity = (challengeTitle: string, score: number) => {
+    setUserProgress(prev => addChallengeActivity(prev, challengeTitle, score));
   };
 
   // Reset progress (for testing or user request)
@@ -178,7 +163,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       rank: 0,
       lastActivityDate: new Date().toISOString(),
       moduleProgress: {},
-      quizScores: {},
+      recentActivities: [],
     };
     setUserProgress(initial);
     saveProgressToStorage(initial);
@@ -193,6 +178,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       userProgress, 
       updateProgress, 
       completeQuiz,
+      addActivity,
       resetProgress 
     }}>
       {children}

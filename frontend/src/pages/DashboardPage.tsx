@@ -7,7 +7,7 @@ import {
   BookOpen, 
   Target, 
   Trophy, 
-  Award, 
+  Medal, 
   TrendingUp,
   ArrowRight,
   CheckCircle2,
@@ -107,10 +107,8 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
           e.currentTarget.style.borderColor = 'rgba(46, 133, 64, 0.3)';
         }}>
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors" style={{
-              backgroundColor: 'rgba(46, 133, 64, 0.1)'
-            }}>
-              <BookOpen className="h-7 w-7" style={{ color: '#2E8540' }} />
+            <div className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors bg-success/10">
+              <BookOpen className="h-7 w-7 text-success" />
             </div>
             <div className="flex-1">
               <h3 className="text-card-foreground mb-2" style={{ 
@@ -143,10 +141,8 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
           e.currentTarget.style.borderColor = 'rgba(46, 133, 64, 0.3)';
         }}>
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors" style={{
-              backgroundColor: 'rgba(46, 133, 64, 0.1)'
-            }}>
-              <Target className="h-7 w-7" style={{ color: '#2E8540' }} />
+            <div className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors bg-success/10">
+              <Target className="h-7 w-7 text-success" />
             </div>
             <div className="flex-1">
               <h3 className="text-card-foreground mb-2" style={{ 
@@ -228,36 +224,24 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
         <Card className="p-6 border-2 border-border bg-card transition-colors duration-200">
           <h3 className="text-card-foreground mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4 text-success" />
+            {userProgress.recentActivities && userProgress.recentActivities.length > 0 ? (
+              userProgress.recentActivities.map((activity) => (
+                <div key={activity.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm truncate text-card-foreground">{activity.title}</p>
+                  </div>
+                  <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">{activity.score}%</span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">No recent activity yet</p>
+                <p className="text-xs mt-1">Complete modules and challenges to track your progress</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm truncate text-card-foreground">Completed Membership Inference</p>
-                <p className="text-xs text-muted-foreground">2 days ago</p>
-              </div>
-              <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">90%</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4 text-success" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm truncate text-card-foreground">Completed Adversarial Examples</p>
-                <p className="text-xs text-muted-foreground">3 days ago</p>
-              </div>
-              <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">92%</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4 text-success" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm truncate text-card-foreground">Completed Data Poisoning</p>
-                <p className="text-xs text-muted-foreground">5 days ago</p>
-              </div>
-              <span className="text-xs px-2 py-1 bg-success/10 text-success rounded">88%</span>
-            </div>
+            )}
           </div>
         </Card>
 
@@ -280,8 +264,8 @@ export function DashboardPage({ user, onNavigate }: DashboardPageProps) {
               className="w-full flex items-center justify-between p-3 bg-muted hover:bg-muted/70 rounded-lg transition-colors text-left"
             >
               <div className="flex items-center gap-3">
-                <Award className="h-5 w-5 text-teal" />
-                <span className="text-sm text-card-foreground">View Certificates</span>
+                <Medal className="h-5 w-5 text-teal" />
+                <span className="text-sm text-card-foreground">View Badges</span>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
             </button>

@@ -87,18 +87,18 @@
 }
 
 .dark {
-  --background: #0F1419;
-  --foreground: #E8F0F2;
+  --background: #112B3C;
+  --foreground: #FFFFFF;
   --card: #1A2332;
-  --card-foreground: #E8F0F2;
+  --card-foreground: #F1F5F9;
   --popover: #1A2332;
-  --popover-foreground: #E8F0F2;
+  --popover-foreground: #F1F5F9;
   --primary: #4CAF50;
   --primary-foreground: #ffffff;
   --secondary: #162E51;
   --secondary-foreground: #E8F0F2;
-  --muted: #1A2332;
-  --muted-foreground: #94A3B8;
+  --muted: #1E293B;
+  --muted-foreground: #CBD5E1;
   --accent: #1B5E20;
   --accent-foreground: #E8F0F2;
   --destructive: #EF4444;
@@ -109,16 +109,16 @@
   --warning-foreground: #0F172A;
   --amber: #FACC15;
   --amber-foreground: #0F172A;
-  --teal: #00A7A7;
+  --teal: #00A79D;
   --teal-foreground: #F1F5F9;
   --border: #475569;
   --input: transparent;
   --input-background: #0F172A;
   --input-border: #475569;
-  --input-border-focus: #00A7A7;
+  --input-border-focus: #00A79D;
   --input-placeholder: #94A3B8;
   --switch-background: #334155;
-  --ring: #00A7A7;
+  --ring: #00A79D;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --chart-1: oklch(0.488 0.243 264.376);
@@ -351,11 +351,76 @@
     }
   }
 
-  /* Disable animations for reduced motion */
+  /* Disable animations for reduced motion - WCAG 2.1 AA */
   @media (prefers-reduced-motion: reduce) {
-    .dark body::after {
-      animation: none;
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
+    
+    .dark body::after {
+      animation: none !important;
+    }
+  }
+
+  /* Accessible Focus Styles - Section 508 Compliance */
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid #00A7A7;
+    outline-offset: 2px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    * {
+      border-width: 2px !important;
+    }
+  }
+
+  /* Screen reader only utility class */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .sr-only-focusable:focus,
+  .sr-only-focusable:active {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* Visible focus for skip links */
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
   }
 
   /* Ensure content stays above background */
@@ -461,12 +526,14 @@ html {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 12px 18px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: none;
     background: var(--popover);
-    color: var(--popover-foreground);
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 16px;
   }
   
   /* Left group: Icon + Text */
@@ -475,11 +542,14 @@ html {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 12px 18px;
     border-radius: 8px;
     background: #1E293B;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 16px;
   }
   
   /* Icon container */
@@ -491,6 +561,14 @@ html {
     width: 20px;
     height: 20px;
     margin-right: 4px;
+    color: #FFFFFF;
+  }
+  
+  /* Override icon colors for all modes */
+  [data-sonner-toast] [data-icon] svg,
+  .dark [data-sonner-toast] [data-icon] svg,
+  :not(.dark) [data-sonner-toast] [data-icon] svg {
+    color: #FFFFFF;
   }
   
   /* Content wrapper (icon + text group) */
@@ -507,17 +585,18 @@ html {
   [data-sonner-toast] [data-close-button],
   [data-sonner-toast] button[data-close-button] {
     position: relative;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     cursor: pointer;
     transition: all 200ms ease;
-    color: #94A3B8;
+    color: #FFFFFF;
+    opacity: 0.8;
     background: transparent;
     border: none;
     flex-shrink: 0;
@@ -528,88 +607,127 @@ html {
   .toast-close-button:hover,
   [data-sonner-toast] [data-close-button]:hover,
   [data-sonner-toast] button[data-close-button]:hover {
-    color: #E2E8F0;
-    background: rgba(255, 255, 255, 0.05);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
   }
   
   .toast-close-button:active,
   [data-sonner-toast] [data-close-button]:active,
   [data-sonner-toast] button[data-close-button]:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
   
   .toast-close-button:focus-visible,
   [data-sonner-toast] [data-close-button]:focus-visible,
   [data-sonner-toast] button[data-close-button]:focus-visible {
-    outline: 2px solid #00A7A7;
+    outline: 2px solid #FFFFFF;
     outline-offset: 2px;
   }
   
-  /* Success Toast */
-  .toast-success,
-  [data-sonner-toast][data-type="success"] {
-    border-left: 4px solid #22C55E;
+  /* Success Toast - Light Mode */
+  :not(.dark) .toast-success,
+  :not(.dark) [data-sonner-toast][data-type="success"] {
+    background: #007A33;
+    color: #FFFFFF;
   }
   
-  /* Error Toast */
-  .toast-error,
-  [data-sonner-toast][data-type="error"] {
-    border-left: 4px solid #EF4444;
+  /* Error Toast - Light Mode */
+  :not(.dark) .toast-error,
+  :not(.dark) [data-sonner-toast][data-type="error"] {
+    background: #B22222;
+    color: #FFFFFF;
   }
   
-  /* Info Toast */
-  .toast-info,
-  [data-sonner-toast][data-type="info"] {
-    border-left: 4px solid #38BDF8;
+  /* Warning Toast - Light Mode */
+  :not(.dark) .toast-warning,
+  :not(.dark) [data-sonner-toast][data-type="warning"] {
+    background: #E6B800;
+    color: #FFFFFF;
+  }
+  
+  /* Info Toast - Light Mode */
+  :not(.dark) .toast-info,
+  :not(.dark) [data-sonner-toast][data-type="info"] {
+    background: #007A33;
+    color: #FFFFFF;
+  }
+  
+  /* Success Toast - Dark Mode */
+  .dark .toast-success,
+  .dark [data-sonner-toast][data-type="success"] {
+    background: #004D26;
+    color: #FFFFFF;
+  }
+  
+  /* Error Toast - Dark Mode */
+  .dark .toast-error,
+  .dark [data-sonner-toast][data-type="error"] {
+    background: #8B1A1A;
+    color: #FFFFFF;
+  }
+  
+  /* Warning Toast - Dark Mode */
+  .dark .toast-warning,
+  .dark [data-sonner-toast][data-type="warning"] {
+    background: #CC9900;
+    color: #FFFFFF;
+  }
+  
+  /* Info Toast - Dark Mode */
+  .dark .toast-info,
+  .dark [data-sonner-toast][data-type="info"] {
+    background: #004D26;
+    color: #FFFFFF;
   }
   
   /* Toast Title */
   .toast-title,
   [data-sonner-toast] [data-title] {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 1.4;
     margin: 0;
     text-align: left;
-    color: #F8FAFC;
+    color: #FFFFFF;
   }
   
   /* Toast Description */
   .toast-description,
   [data-sonner-toast] [data-description] {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.4;
-    color: var(--muted-foreground);
+    color: #FFFFFF;
+    opacity: 0.9;
     text-align: left;
   }
   
-  /* Toast Animations - override to prevent duplicate animation */
+  /* Toast Animations - smooth fade-in and fade-out */
   [data-sonner-toast]:not([data-dismissed="true"]) {
-    animation: toast-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: toast-fade-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   
   [data-sonner-toast][data-dismissed="true"] {
-    animation: toast-slide-out 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: toast-fade-out 250ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   
-  @keyframes toast-slide-in {
+  @keyframes toast-fade-in {
     from {
-      transform: translateX(100%);
+      transform: translateY(-10px);
       opacity: 0;
     }
     to {
-      transform: translateX(0);
+      transform: translateY(0);
       opacity: 1;
     }
   }
   
-  @keyframes toast-slide-out {
+  @keyframes toast-fade-out {
     from {
-      transform: translateX(0);
+      transform: translateY(0);
       opacity: 1;
     }
     to {
-      transform: translateX(100%);
+      transform: translateY(-10px);
       opacity: 0;
     }
   }
@@ -625,59 +743,78 @@ html {
     }
   }
   
-  /* Dark mode specific adjustments */
+  /* Override close button color for all modes */
+  .toast-close-button,
+  [data-sonner-toast] [data-close-button],
+  [data-sonner-toast] button[data-close-button],
   .dark .toast-close-button,
   .dark [data-sonner-toast] [data-close-button],
-  .dark [data-sonner-toast] button[data-close-button] {
-    color: #94A3B8;
-  }
-  
-  .dark .toast-close-button:hover,
-  .dark [data-sonner-toast] [data-close-button]:hover,
-  .dark [data-sonner-toast] button[data-close-button]:hover {
-    color: #E2E8F0;
-    background: rgba(255, 255, 255, 0.08);
-  }
-  
-  .dark [data-sonner-toast] {
-    background: #1E293B;
-  }
-  
-  .dark [data-sonner-toast] [data-title] {
-    color: #F8FAFC;
-  }
-  
-  /* Light mode specific adjustments */
+  .dark [data-sonner-toast] button[data-close-button],
   :not(.dark) .toast-close-button,
   :not(.dark) [data-sonner-toast] [data-close-button],
   :not(.dark) [data-sonner-toast] button[data-close-button] {
-    color: #64748B;
+    color: #FFFFFF;
+    opacity: 0.8;
   }
   
+  .toast-close-button:hover,
+  [data-sonner-toast] [data-close-button]:hover,
+  [data-sonner-toast] button[data-close-button]:hover,
+  .dark .toast-close-button:hover,
+  .dark [data-sonner-toast] [data-close-button]:hover,
+  .dark [data-sonner-toast] button[data-close-button]:hover,
   :not(.dark) .toast-close-button:hover,
   :not(.dark) [data-sonner-toast] [data-close-button]:hover,
   :not(.dark) [data-sonner-toast] button[data-close-button]:hover {
-    color: #334155;
-    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
   }
   
-  :not(.dark) [data-sonner-toast] {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-  }
-  
+  /* Override title color for all modes */
+  .toast-title,
+  [data-sonner-toast] [data-title],
+  .dark .toast-title,
+  .dark [data-sonner-toast] [data-title],
+  :not(.dark) .toast-title,
   :not(.dark) [data-sonner-toast] [data-title] {
-    color: #0F172A;
+    color: #FFFFFF;
+  }
+  
+  /* Override description color for all modes */
+  .toast-description,
+  [data-sonner-toast] [data-description],
+  .dark .toast-description,
+  .dark [data-sonner-toast] [data-description],
+  :not(.dark) .toast-description,
+  :not(.dark) [data-sonner-toast] [data-description] {
+    color: #FFFFFF;
+    opacity: 0.9;
   }
   
   /* Ensure toast has proper z-index */
   [data-sonner-toaster] {
     z-index: 9999;
+    --normal-bg: transparent;
   }
   
-  /* Progress bar for auto-dismiss */
-  [data-sonner-toast] [data-progressbar] {
-    background: var(--primary);
-    opacity: 0.3;
+  /* Loader/spinner color */
+  [data-sonner-toast] [data-icon] [data-loading-icon] {
+    color: #FFFFFF;
+  }
+  
+  /* Remove default border on all types */
+  [data-sonner-toast][data-type="success"],
+  [data-sonner-toast][data-type="error"],
+  [data-sonner-toast][data-type="warning"],
+  [data-sonner-toast][data-type="info"],
+  .dark [data-sonner-toast][data-type="success"],
+  .dark [data-sonner-toast][data-type="error"],
+  .dark [data-sonner-toast][data-type="warning"],
+  .dark [data-sonner-toast][data-type="info"],
+  :not(.dark) [data-sonner-toast][data-type="success"],
+  :not(.dark) [data-sonner-toast][data-type="error"],
+  :not(.dark) [data-sonner-toast][data-type="warning"],
+  :not(.dark) [data-sonner-toast][data-type="info"] {
+    border: none;
   }
 }

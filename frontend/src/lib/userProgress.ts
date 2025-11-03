@@ -14,12 +14,21 @@ export interface ModuleProgress {
   lastAccessedDate: string;
 }
 
+export interface Activity {
+  id: string;
+  title: string;
+  score: number;
+  type: 'module' | 'challenge';
+  timestamp: string;
+}
+
 export interface UserProgress {
   completedModules: number[];
   totalScore: number;
   rank: number;
   lastActivityDate: string;
   moduleProgress: Record<number, ModuleProgress>;
+  recentActivities: Activity[];
 }
 
 export const calculateTotalScore = (completedModules: number[]): number => {
@@ -143,10 +152,40 @@ export const updateModuleSection = (
   };
 };
 
+export const addChallengeActivity = (
+  userProgress: UserProgress,
+  challengeTitle: string,
+  score: number
+): UserProgress => {
+  const recentActivities = [...(userProgress.recentActivities || [])];
+  
+  const newActivity: Activity = {
+    id: `challenge-${Date.now()}`,
+    title: `Completed ${challengeTitle}`,
+    score,
+    type: 'challenge',
+    timestamp: new Date().toISOString(),
+  };
+  
+  recentActivities.unshift(newActivity);
+  
+  // Keep only the last 10 activities
+  if (recentActivities.length > 10) {
+    recentActivities.pop();
+  }
+  
+  return {
+    ...userProgress,
+    recentActivities,
+    lastActivityDate: new Date().toISOString(),
+  };
+};
+
 export const completeModuleQuiz = (
   userProgress: UserProgress,
   moduleId: number,
-  quizScore: number
+  quizScore: number,
+  moduleTitle?: string
 ): UserProgress => {
   const currentModuleProgress = userProgress.moduleProgress[moduleId] || initializeModuleProgress(moduleId);
   
@@ -172,6 +211,23 @@ export const completeModuleQuiz = (
     ? [...userProgress.completedModules, moduleId]
     : userProgress.completedModules;
   
+  // Add to recent activities if passed and new completion
+  const recentActivities = [...(userProgress.recentActivities || [])];
+  if (passed && !userProgress.completedModules.includes(moduleId) && moduleTitle) {
+    const newActivity: Activity = {
+      id: `module-${moduleId}-${Date.now()}`,
+      title: `Completed ${moduleTitle}`,
+      score: quizScore,
+      type: 'module',
+      timestamp: new Date().toISOString(),
+    };
+    recentActivities.unshift(newActivity);
+    // Keep only the last 10 activities
+    if (recentActivities.length > 10) {
+      recentActivities.pop();
+    }
+  }
+  
   return {
     ...userProgress,
     completedModules,
@@ -179,6 +235,7 @@ export const completeModuleQuiz = (
       ...userProgress.moduleProgress,
       [moduleId]: updatedModuleProgress,
     },
+    recentActivities,
     lastActivityDate: new Date().toISOString(),
   };
 };

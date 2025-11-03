@@ -4,19 +4,16 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
-import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import { 
   Send, 
   Terminal, 
-  Shield, 
   Target, 
   Lightbulb,
   Flag,
   ChevronLeft,
 } from "lucide-react";
 import { type ChallengeLevel } from "../../lib/challengeProgress";
-import { HintsPanel } from "./HintsPanel";
 import { ResultsPanel } from "./ResultsPanel";
 import { AlternativeSolutionsModal } from "./AlternativeSolutionsModal";
 import { SolutionRevealModal } from "./SolutionRevealModal";
@@ -34,7 +31,6 @@ export function ChallengeEnvironment({
   onComplete,
   onExit,
 }: ChallengeEnvironmentProps) {
-  const [defenseMode, setDefenseMode] = useState(false);
   const [input, setInput] = useState("");
   const [flagInput, setFlagInput] = useState("");
   const [messages, setMessages] = useState([
@@ -45,7 +41,6 @@ export function ChallengeEnvironment({
   ]);
   const [attempts, setAttempts] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
-  const [showHints, setShowHints] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [showSolutionReveal, setShowSolutionReveal] = useState(false);
@@ -69,12 +64,7 @@ export function ChallengeEnvironment({
     const newMessages = [...messages, { role: "user", content: input }];
 
     // Simulate AI response
-    let response = "";
-    if (defenseMode) {
-      response = "🛡️ Defense mode active. Input validated and sanitized. Processing secure query...";
-    } else {
-      response = "Processing your input. Analyzing for vulnerabilities...";
-    }
+    const response = "Processing your input. Analyzing for vulnerabilities...";
 
     newMessages.push({ role: "assistant", content: response });
     setMessages(newMessages);
@@ -233,15 +223,16 @@ export function ChallengeEnvironment({
 
             {/* Hints Button */}
             <Button
-              onClick={() => setShowHints(true)}
+              onClick={handleRequestHint}
               variant="outline"
               size="sm"
               className="gap-2 border-teal text-teal hover:bg-teal/10 focus-visible:outline-teal focus-visible:outline-2 transition-colors duration-200"
-              aria-label="Open hints panel"
-              title="Click to view hint"
+              aria-label="Get hint"
+              title="Click to get hint"
+              disabled={hintsUsed >= challenge.hints.length}
             >
               <Lightbulb className="h-4 w-4 fill-teal" aria-hidden="true" />
-              Hints
+              Hint ({hintsUsed}/{challenge.hints.length})
             </Button>
           </div>
         </div>
@@ -293,31 +284,18 @@ export function ChallengeEnvironment({
           <div className="lg:col-span-2">
             <Card className="p-6 border-2 border-border bg-card h-full flex flex-col transition-colors duration-200">
               {/* Header */}
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <Terminal className="h-5 w-5 text-teal" />
-                  <h3 className="text-card-foreground">Simulation Environment</h3>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Label htmlFor="defense-mode" className="flex items-center gap-2 cursor-pointer">
-                    <Shield
-                      className={`h-4 w-4 ${defenseMode ? "text-success" : "text-muted-foreground"}`}
-                    />
-                    Defense Mode
-                  </Label>
-                  <Switch
-                    id="defense-mode"
-                    checked={defenseMode}
-                    onCheckedChange={setDefenseMode}
-                  />
-                </div>
+              <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border">
+                <Terminal className="h-5 w-5 text-teal" />
+                <h3 className="text-card-foreground">Simulation Environment</h3>
               </div>
 
               {/* Console Output */}
               <div className="flex-1 bg-muted/50 dark:bg-black/30 rounded-lg p-4 mb-4 min-h-[300px] max-h-[400px] overflow-y-auto font-mono text-sm transition-colors duration-200">
                 {messages.map((message, index) => (
-                  <div key={index} className="mb-3">
+                  <div 
+                    key={index} 
+                    className={`mb-3 ${message.role === "hint" ? "animate-in fade-in duration-500" : ""}`}
+                  >
                     <div className="flex gap-2 mb-1">
 
                       <span
@@ -400,15 +378,6 @@ export function ChallengeEnvironment({
           </div>
         </div>
       </div>
-
-      {/* Hints Panel */}
-      <HintsPanel
-        isOpen={showHints}
-        onClose={() => setShowHints(false)}
-        currentHints={challenge.hints}
-        onRequestHint={handleRequestHint}
-        hintsUsed={hintsUsed}
-      />
 
       {/* Alternative Solutions Modal */}
       <AlternativeSolutionsModal

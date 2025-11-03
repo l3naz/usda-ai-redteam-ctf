@@ -92,10 +92,15 @@ function AppContent() {
   };
 
   const handleOpenAuthModal = () => {
-    setShowAuthModal(true);
+    // Prevent opening modal if user is already authenticated
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    }
   };
 
   const handleLoginSuccess = () => {
+    // Close modal immediately
+    setShowAuthModal(false);
     // After successful login, redirect to leaderboard
     handleNavigate("leaderboard");
   };
@@ -115,13 +120,18 @@ function AppContent() {
     updateProgress(moduleId, section);
   };
 
-  const handleQuizComplete = (moduleId: number, score: number) => {
-    completeQuiz(moduleId, score);
+  const handleQuizComplete = (moduleId: number, score: number, moduleTitle?: string) => {
+    completeQuiz(moduleId, score, moduleTitle);
   };
 
   // Show auth modal if trying to access protected page without auth
+  // Close modal immediately when user becomes authenticated
   useEffect(() => {
-    if (protectedPages.includes(currentPage) && !isAuthenticated) {
+    if (isAuthenticated) {
+      // User is authenticated - ensure modal is closed
+      setShowAuthModal(false);
+    } else if (protectedPages.includes(currentPage) && !isAuthenticated) {
+      // User trying to access protected page without auth - show modal
       setShowAuthModal(true);
     }
   }, [currentPage, isAuthenticated]);
@@ -129,19 +139,33 @@ function AppContent() {
   // Show loading screen while checking auth state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-live="polite">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" aria-hidden="true"></div>
+          <p className="mt-4 text-muted-foreground">Loading application...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background relative">
+    <div className="min-h-screen flex flex-col bg-background relative" lang="en">
+      {/* Skip to main content link for keyboard users */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+      
       {/* Toaster for notifications */}
-      <Toaster position="top-right" />
+      <Toaster 
+        position="top-right" 
+        expand={false}
+        richColors
+        visibleToasts={5}
+      />
 
       {/* Enhanced Professional Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -162,12 +186,6 @@ function AppContent() {
         </div>
       </div>
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleCloseAuthModal}
-      />
-
       {/* Header - Only show when authenticated */}
       {isAuthenticated && (
         <Header
@@ -182,7 +200,7 @@ function AppContent() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 relative z-10">
+      <main className="flex-1 relative z-10" role="main" id="main-content">
         {!isAuthenticated && currentPage === "home" && (
           <LandingPage 
             onNavigate={handleNavigate}
@@ -245,12 +263,14 @@ function AppContent() {
       {/* Footer */}
       <Footer />
 
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={handleCloseAuthModal}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      {/* Auth Modal - Only render when NOT authenticated */}
+      {!isAuthenticated && (
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={handleCloseAuthModal}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
     </div>
   );
 }

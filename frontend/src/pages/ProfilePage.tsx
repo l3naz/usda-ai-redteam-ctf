@@ -8,12 +8,19 @@ import { Progress } from "../components/ui/progress";
 import { Separator } from "../components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Alert, AlertDescription } from "../components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { calculateCompletionPercentage } from "../lib/userProgress";
 import { vulnerabilities } from "../lib/vulnerabilities";
 import { useUser } from "../context/UserContext";
+import { toast } from "sonner@2.0.3";
 import {
   Award,
-  Download,
   Mail,
   Calendar,
   Shield,
@@ -37,12 +44,19 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
   const { user, userProgress } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
+  const [showCustomRole, setShowCustomRole] = useState(false);
+  const [customRoleInput, setCustomRoleInput] = useState("");
   const [formData, setFormData] = useState({
     fullName: user?.displayName || "User",
     email: user?.email || "",
     mobileNumber: "+1 (555) 123-4567",
   });
   const [originalData, setOriginalData] = useState(formData);
+  
+  // Load role from localStorage
+  const [userRole, setUserRole] = useState(() => {
+    return localStorage.getItem("userRole") || "";
+  });
 
   const completionPercentage = calculateCompletionPercentage(userProgress.completedModules);
   
@@ -115,6 +129,27 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
     alert("Verification code sent to " + formData.mobileNumber);
   };
 
+  const handleRoleChange = (value: string) => {
+    if (value === "other") {
+      setShowCustomRole(true);
+      setCustomRoleInput("");
+    } else {
+      setShowCustomRole(false);
+      setUserRole(value);
+      localStorage.setItem("userRole", value);
+      toast.success("Role updated successfully!");
+    }
+  };
+
+  const handleCustomRoleSubmit = () => {
+    if (customRoleInput.trim()) {
+      setUserRole(customRoleInput.trim());
+      localStorage.setItem("userRole", customRoleInput.trim());
+      setShowCustomRole(false);
+      toast.success("Role updated successfully!");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 transition-colors duration-200">
       {/* Header */}
@@ -139,13 +174,51 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
               </AvatarFallback>
             </Avatar>
             <h3 className="text-primary mb-1">{user.displayName || user.email?.split("@")[0] || "User"}</h3>
-            <p className="text-sm text-muted-foreground mb-4">Security Analyst</p>
-            <div className="flex flex-col gap-2">
-              <Badge variant="outline" className="bg-teal/10 border-teal/20" style={{ color: "#00a7a7" }}>
-                Active Learner
-              </Badge>
-              {user.uid && (
-                <div className="text-xs text-muted-foreground mt-2">
+            
+            {/* Role Selector */}
+            <div className="mb-4 px-4">
+              {!showCustomRole ? (
+                <Select value={userRole} onValueChange={handleRoleChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Security Analyst">Security Analyst</SelectItem>
+                    <SelectItem value="AI Researcher">AI Researcher</SelectItem>
+                    <SelectItem value="Data Scientist">Data Scientist</SelectItem>
+                    <SelectItem value="Developer">Developer</SelectItem>
+                    <SelectItem value="System Engineer">System Engineer</SelectItem>
+                    <SelectItem value="Student">Student</SelectItem>
+                    <SelectItem value="other">Other (custom input)</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter your role"
+                    value={customRoleInput}
+                    onChange={(e) => setCustomRoleInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleCustomRoleSubmit();
+                      }
+                    }}
+                    className="text-sm"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleCustomRoleSubmit}
+                    disabled={!customRoleInput.trim()}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowCustomRole(false)}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               )}
             </div>
@@ -199,13 +272,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
         <div className="lg:col-span-2 space-y-6">
           {/* Progress Overview */}
           <Card className="p-6 border-2 border-border">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-primary">Training Progress</h3>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Download className="h-4 w-4" />
-                Download Certificate
-              </Button>
-            </div>
+            <h3 className="text-primary mb-6">Training Progress</h3>
 
             {/* Stats Grid */}
             <div className="grid md:grid-cols-3 gap-4 mb-6">

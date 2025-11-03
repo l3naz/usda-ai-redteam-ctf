@@ -2,10 +2,7 @@ import { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Switch } from "./ui/switch";
-import { Label } from "./ui/label";
-import { Send, Terminal, Shield, AlertCircle, ExternalLink } from "lucide-react";
-import { Alert, AlertDescription } from "./ui/alert";
+import { Send, Terminal, ExternalLink } from "lucide-react";
 
 interface InteractiveLabProps {
   onNavigateToSimulation?: () => void;
@@ -14,7 +11,6 @@ interface InteractiveLabProps {
 
 export function InteractiveLab({ onNavigateToSimulation, onComplete }: InteractiveLabProps) {
   const hasStarted = useRef(false);
-  const [defenseMode, setDefenseMode] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -35,12 +31,10 @@ export function InteractiveLab({ onNavigateToSimulation, onComplete }: Interacti
     // Add user message
     const newMessages = [...messages, { role: "user", content: input }];
     
-    // Simulate response based on defense mode
+    // Simulate response
     let response = "";
-    if (input.toLowerCase().includes("ignore") && !defenseMode) {
+    if (input.toLowerCase().includes("ignore")) {
       response = "Warning: Potential prompt injection detected. System responding to manipulated instructions.";
-    } else if (defenseMode) {
-      response = "Input validated. Defense mechanisms active. Processing legitimate query only.";
     } else {
       response = "Processing your request regarding crop recommendations...";
     }
@@ -55,44 +49,11 @@ export function InteractiveLab({ onNavigateToSimulation, onComplete }: Interacti
       <h2 className="mb-4 text-primary">Interactive Lab</h2>
       
       <Card className="p-6 shadow-sm border-border">
-        {/* Header with Defense Toggle */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Terminal className="h-5 w-5 text-primary" />
-            <h3 className="text-primary">AI Sandbox Environment</h3>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <Label htmlFor="defense-mode" className="flex items-center gap-2 cursor-pointer">
-              <Shield className={`h-4 w-4 ${defenseMode ? 'text-green-600' : 'text-muted-foreground'}`} />
-              Defense Mode
-            </Label>
-            <Switch 
-              id="defense-mode"
-              checked={defenseMode}
-              onCheckedChange={setDefenseMode}
-            />
-          </div>
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-4 pb-4 border-b border-border">
+          <Terminal className="h-5 w-5 text-primary" />
+          <h3 className="text-primary">AI Sandbox Environment</h3>
         </div>
-
-        {/* Status Alert */}
-        {defenseMode && (
-          <Alert className="mb-4 border-green-600/20 bg-green-50">
-            <Shield className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              Defense mechanisms are active. Input validation and prompt filtering enabled.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {!defenseMode && (
-          <Alert className="mb-4 border-destructive/20 bg-red-50">
-            <AlertCircle className="h-4 w-4 text-destructive" />
-            <AlertDescription className="text-red-800">
-              Defense mode disabled. System is vulnerable to prompt injection attacks.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Chat Interface */}
         <div className="bg-muted/50 rounded-lg p-4 mb-4 min-h-[300px] max-h-[400px] overflow-y-auto space-y-3">

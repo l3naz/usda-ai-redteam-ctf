@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { Shield } from "lucide-react";
+import usdaLogo from "figma:asset/fe46ba86f87cfc9f9ab97c58bcc60686524f146d.png";
 
 interface ContinueTrainingBannerProps {
   onContinue: () => void;
@@ -22,15 +22,24 @@ export function ContinueTrainingBanner({
           className="w-16 h-16 rounded-lg flex items-center justify-center shadow-sm"
           style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
         >
-          <Shield className="h-8 w-8" style={{ color: '#FFFFFF' }} />
+          <img 
+            src={usdaLogo} 
+            alt="USDA – United States Department of Agriculture"
+            className="drop-shadow-md"
+            style={{ 
+              width: '42px', 
+              height: 'auto',
+              objectFit: 'contain'
+            }}
+          />
         </div>
         
         <h3
+          className="text-white"
           style={{
             fontFamily: 'Public Sans, sans-serif',
             fontWeight: 700,
             fontSize: '1.5rem',
-            color: '#FFFFFF',
             marginBottom: '0.5rem',
           }}
         >
@@ -38,11 +47,10 @@ export function ContinueTrainingBanner({
         </h3>
         
         <p
-          className="max-w-2xl"
+          className="max-w-2xl text-slate-100"
           style={{
             fontFamily: 'Source Sans Pro, sans-serif',
             fontSize: '1rem',
-            color: '#E8F0F2',
             lineHeight: '1.6',
           }}
         >
@@ -52,18 +60,10 @@ export function ContinueTrainingBanner({
         <Button
           onClick={onContinue}
           size="lg"
-          className="mt-4"
+          className="mt-4 bg-success dark:bg-teal text-white hover:bg-success/90 dark:hover:bg-teal/90"
           style={{
-            backgroundColor: '#2E8540',
-            color: '#FFFFFF',
             fontFamily: 'Public Sans, sans-serif',
             fontWeight: 600,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#1B5E20';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#2E8540';
           }}
         >
           {buttonText}
